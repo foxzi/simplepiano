@@ -112,6 +112,27 @@ hardware and were exercised in the browser during development.
   gesture, per browser autoplay policies.
 - No backend, no accounts, no analytics — everything runs in your browser.
 
+## If there is no sound at all
+
+The "On-screen keyboard" section has a "Check sound" button and an audio status
+badge. Press the button — you should hear an A4 tone about a second long and the
+badge should switch to "running".
+
+| Badge | Meaning |
+| --- | --- |
+| running | Web Audio is started and routed to the system output |
+| blocked by the browser | The context is still asleep — press "Check sound" or any key |
+| Web Audio not supported | Use a modern browser (Chrome, Edge, Safari, Firefox) |
+| error | The browser error message is shown under the badge |
+
+If the badge says "running" but you still hear nothing, the cause is outside the
+app: check the system volume, the per-tab volume in your mixer, the selected
+output device and that the tab is not muted.
+
+Clicks on the on-screen keys, the scale demo and the metronome always produce
+sound. The "Synth sound for MIDI" toggle only affects notes arriving from an
+external MIDI keyboard.
+
 ## If your MIDI keyboard makes no sound
 
 1. Make sure the "Synth sound for MIDI" toggle in the "On-screen keyboard"
