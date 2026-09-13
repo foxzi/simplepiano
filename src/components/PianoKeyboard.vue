@@ -7,7 +7,7 @@
       :class="keyClasses(key)"
       :style="key.isBlack ? { left: key.leftStyle } : null"
       :aria-label="key.label"
-      :data-label="key.isC ? key.label : null"
+      :data-label="keyLabel(key)"
       @pointerdown.prevent="handleDown(key.midi)"
       @pointerup="handleUp(key.midi)"
       @pointerleave="handleUp(key.midi)"
@@ -22,9 +22,13 @@
 import { computed } from "vue";
 import { PIANO_MIN_MIDI, PIANO_MAX_MIDI, BLACK_OFFSETS, noteName } from "../constants/piano";
 
+// Состояние (нажатия, подсветка, подписи) берём из общего хранилища:
+// клавиатура одна на всё приложение, а управляют ей страницы уроков.
 const props = defineProps({
   activeNotes: { type: Object, default: () => ({}) },
-  expectedMidi: { type: Number, default: null },
+  expectedNotes: { type: Array, default: () => [] },
+  doneNotes: { type: Array, default: () => [] },
+  labels: { type: Object, default: () => ({}) },
 });
 const emit = defineEmits(["note-on", "note-off"]);
 
@@ -57,8 +61,20 @@ const keys = computed(() => {
 function keyClasses(key) {
   return [
     key.isBlack ? "piano__black" : "piano__white",
-    { "is-c": key.isC, "is-active": !!props.activeNotes[key.midi], "is-expected": props.expectedMidi === key.midi },
+    {
+      "is-c": key.isC,
+      "is-active": !!props.activeNotes[key.midi],
+      "is-expected": props.expectedNotes.includes(key.midi),
+      "is-done": props.doneNotes.includes(key.midi),
+    },
   ];
+}
+
+// Подпись на клавише: заданная уроком либо стандартная пометка на До.
+function keyLabel(key) {
+  const custom = props.labels[key.midi];
+  if (custom) return custom;
+  return key.isC ? key.label : null;
 }
 
 function handleDown(midi) {
