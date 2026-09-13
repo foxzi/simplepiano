@@ -538,6 +538,37 @@ output {
   color: var(--danger);
 }
 
+.audio-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  color: var(--text-soft);
+}
+
+.audio-badge::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.audio-badge--ok {
+  color: var(--accent-strong);
+}
+
+.audio-badge--wait {
+  color: var(--text-soft);
+}
+
+.audio-badge--bad {
+  color: var(--danger);
+}
+
 /* ---------- piano ---------- */
 
 .piano-scroll {

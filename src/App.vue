@@ -53,6 +53,15 @@
           </p>
 
           <div class="row row--wrap">
+            <button type="button" class="btn" @click="testSound">Проверить звук</button>
+            <span class="audio-badge" :class="'audio-badge--' + audioStatusKind" role="status" aria-live="polite">
+              Звук: {{ audioStatusText }}
+            </span>
+          </div>
+
+          <p class="card__hint" v-if="synth.state.error">Сообщение браузера: {{ synth.state.error }}</p>
+
+          <div class="row row--wrap">
             <label class="switch">
               <input type="checkbox" v-model="soundEnabled" @change="onSoundChange" />
               <span class="switch__track" aria-hidden="true"></span>
@@ -276,6 +285,36 @@ function onUiNoteOff(midiNote) {
   synth.stopHeld(midiNote);
 }
 
+// Диагностика звука: контрольная нота ля₄ и понятный статус аудиоконтекста.
+function testSound() {
+  synth.ensureContext();
+  synth.playTransient(69, 700);
+}
+
+const audioStatusKind = computed(() => {
+  const s = synth.state.status;
+  if (s === "running") return "ok";
+  if (s === "unsupported" || s === "error") return "bad";
+  return "wait";
+});
+
+const audioStatusText = computed(() => {
+  switch (synth.state.status) {
+    case "running":
+      return "работает";
+    case "suspended":
+      return "заблокирован браузером — нажмите «Проверить звук»";
+    case "closed":
+      return "контекст закрыт";
+    case "unsupported":
+      return "браузер не поддерживает Web Audio";
+    case "error":
+      return "ошибка при создании аудиоконтекста";
+    default:
+      return "ещё не запускался";
+  }
+});
+
 const progressPct = computed(() => Math.round((exercise.state.index / exercise.state.total) * 100));
 const feedbackClass = computed(() => (exercise.state.feedbackKind ? "status--" + exercise.state.feedbackKind : ""));
 
@@ -295,9 +334,22 @@ function handleVisibility() {
   if (document.hidden) handleAppBlur();
 }
 
+// Первый настоящий жест пользователя на странице разблокирует аудиоконтекст,
+// чтобы самая первая нажатая клавиша уже звучала.
+function unlockAudio() {
+  synth.ensureContext();
+  if (synth.state.status === "running") {
+    document.removeEventListener("pointerdown", unlockAudio, true);
+    document.removeEventListener("keydown", unlockAudio, true);
+  }
+}
+
 onMounted(() => {
   midi.featureCheck();
   exercise.renderStoredResult();
+
+  document.addEventListener("pointerdown", unlockAudio, true);
+  document.addEventListener("keydown", unlockAudio, true);
 
   window.addEventListener("blur", handleAppBlur);
   window.addEventListener("focus", handleAppFocus);
@@ -305,6 +357,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  document.removeEventListener("pointerdown", unlockAudio, true);
+  document.removeEventListener("keydown", unlockAudio, true);
+
   window.removeEventListener("blur", handleAppBlur);
   window.removeEventListener("focus", handleAppFocus);
   document.removeEventListener("visibilitychange", handleVisibility);
