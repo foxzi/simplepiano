@@ -1,0 +1,35 @@
+// Константы клавиатуры и упражнения — гамма До мажор, одна октава.
+
+// Русские названия нот (сольфеджио), индекс = midi % 12, До = 0
+export const NOTE_NAMES_RU = [
+  "До", "До\u266F", "Ре", "Ре\u266F", "Ми", "Фа",
+  "Фа\u266F", "Соль", "Соль\u266F", "Ля", "Ля\u266F", "Си",
+];
+
+// Диапазон видимой клавиатуры: до 4-й октавы (MIDI 60) .. до 6-й октавы (MIDI 84)
+export const PIANO_MIN_MIDI = 60;
+export const PIANO_MAX_MIDI = 84;
+
+// Смещения внутри октавы для белых и чёрных клавиш
+export const WHITE_OFFSETS = [0, 2, 4, 5, 7, 9, 11];
+export const BLACK_OFFSETS = [1, 3, 6, 8, 10];
+
+// Упражнение: гамма до мажор вверх, C4..C5 (MIDI 60..72)
+export const EXERCISE_SEQUENCE = [60, 62, 64, 65, 67, 69, 71, 72];
+export const FINGERING = {
+  right: [1, 2, 3, 1, 2, 3, 4, 5],
+  left: [5, 4, 3, 2, 1, 3, 2, 1],
+};
+
+export const DEMO_STEP_MS = 480;
+export const DEMO_NOTE_MS = 420;
+
+export function noteName(midi) {
+  const name = NOTE_NAMES_RU[((midi % 12) + 12) % 12];
+  const octave = Math.floor(midi / 12) - 1;
+  return name + octave;
+}
+
+export function midiToFrequency(midi) {
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
