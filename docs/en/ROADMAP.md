@@ -2,9 +2,9 @@
 
 > **Note:** this document describes the **desired and planned curriculum** —
 > the direction the project is aiming for. It is **not** a list of already
-> implemented features. Today the app implements only a small part of what
-> is listed below (see [README.md](./README.md), "Limitations" section).
-> The items below are a development plan, not a claim of readiness.
+> implemented features. Today topics 1–10 are implemented (see the
+> "Lessons 1-10" section of [README.md](./README.md)); the remaining items
+> are a development plan, not a claim of readiness.
 
 ## Full curriculum (48 topics)
 
@@ -62,7 +62,10 @@ future edits of this document.
 
 ## Status
 
-The current prototype includes a one-octave C major scale exercise with
-hand selection; this is a foundation for topics 19–20, not a complete course.
-This list describes the intended curriculum, not a list of completed lessons.
+Topics 1–10 are implemented as seven lesson pages with theory and keyboard
+practice (see the "Lessons 1-10" section of [README.md](./README.md)). The
+one-octave C major scale trainer with hand selection is still available
+separately and is a foundation for topics 19–20. Topics 11–48 are not
+implemented yet: this list describes the intended curriculum, not a list of
+completed lessons.
 See [README.md](./README.md) for the prototype's capabilities.
