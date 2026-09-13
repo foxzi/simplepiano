@@ -1,4 +1,7 @@
-// Web Audio — простой синтезатор (осциллятор triangle).
+// Web Audio — многотембровый синтезатор.
+//
+// Голос собирается из гармоник выбранного пресета (см. constants/instruments.js):
+// осцилляторы -> фильтр нижних частот -> огибающая громкости -> выход.
 //
 // Браузеры создают AudioContext в состоянии suspended и возобновляют его только
 // после жеста пользователя, причём resume() асинхронный. Поэтому ноты, запрошенные
@@ -6,13 +9,37 @@
 
 import { reactive } from "vue";
 import { midiToFrequency } from "../constants/piano";
+import { INSTRUMENTS, DEFAULT_INSTRUMENT_ID, findInstrument } from "../constants/instruments";
+
+const STORAGE_KEY = "pianoL.instrument.v1";
+
+function safeGet() {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY);
+  } catch (err) {
+    return null;
+  }
+}
+
+function safeSet(value) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, value);
+  } catch (err) {
+    /* private-режим или storage отключён — выбор просто не сохранится */
+  }
+}
 
 export function useSynth() {
+  const storedId = safeGet();
   // status: unsupported | idle | suspended | running | closed | error
-  const state = reactive({ status: "idle", error: "" });
+  const state = reactive({
+    status: "idle",
+    error: "",
+    instrumentId: INSTRUMENTS.some((i) => i.id === storedId) ? storedId : DEFAULT_INSTRUMENT_ID,
+  });
 
   let audioCtx = null;
-  const heldNotes = new Map(); // midi -> { osc, gain }
+  const heldNotes = new Map(); // midi -> voice
   const pendingHeld = new Set(); // ноты, ждущие возобновления контекста
 
   function syncStatus() {
@@ -66,21 +93,78 @@ export function useSynth() {
     );
   }
 
-  function spawnHeld(ctx, midi) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.value = midiToFrequency(midi);
+  function currentPreset() {
+    return findInstrument(state.instrumentId);
+  }
 
+  // Время спада конкретной ноты: у фортепиано верхние ноты гаснут быстрее.
+  function decayTime(preset, midi) {
+    if (!preset.decayPitchSemitones) return preset.decay;
+    return preset.decay * Math.pow(2, -(midi - 60) / preset.decayPitchSemitones);
+  }
+
+  // Собирает и запускает голос; возвращает объект с методом release().
+  function spawnVoice(ctx, midi, preset) {
     const now = ctx.currentTime;
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.22, now + 0.02);
+    const freq = midiToFrequency(midi);
+    const decay = decayTime(preset, midi);
+    const sustain = preset.sustain;
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0, now);
+    env.gain.linearRampToValueAtTime(preset.gain, now + preset.attack);
+    const sustainLevel = Math.max(preset.gain * sustain, 0.0001);
+    env.gain.exponentialRampToValueAtTime(sustainLevel, now + preset.attack + decay);
+    env.connect(ctx.destination);
 
-    heldNotes.set(midi, { osc, gain });
+    let input = env;
+    if (preset.filter) {
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.Q.value = preset.filter.q;
+      filter.frequency.setValueAtTime(preset.filter.from, now);
+      filter.frequency.exponentialRampToValueAtTime(preset.filter.to, now + preset.attack + decay);
+      filter.connect(env);
+      input = filter;
+    }
+
+    const oscillators = preset.partials.map((partial) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = partial.type;
+      osc.frequency.value = freq * partial.ratio;
+      if (partial.detune) osc.detune.value = partial.detune;
+      gain.gain.value = partial.gain;
+      osc.connect(gain);
+      gain.connect(input);
+      osc.start(now);
+      return osc;
+    });
+
+    let released = false;
+
+    // at === undefined — отпускание прямо сейчас (клавиша поднята),
+    // иначе — заранее запланированное отпускание (демонстрация, метроном).
+    function release(at) {
+      if (released) return;
+      released = true;
+      const time = at == null ? ctx.currentTime : at;
+      try {
+        if (at == null) {
+          env.gain.cancelScheduledValues(time);
+          env.gain.setValueAtTime(Math.max(env.gain.value, 0.0001), time);
+          env.gain.exponentialRampToValueAtTime(0.0001, time + preset.release);
+        } else {
+          env.gain.setTargetAtTime(0.0001, time, preset.release / 3);
+        }
+        const stopAt = time + preset.release + 0.05;
+        oscillators.forEach((osc) => osc.stop(stopAt));
+      } catch (err) {
+        /* игнорируем, если контекст уже закрыт */
+      }
+    }
+
+    return { release };
   }
 
   function startHeld(midi) {
@@ -89,13 +173,13 @@ export function useSynth() {
     stopHeld(midi);
 
     if (ctx.state === "running") {
-      spawnHeld(ctx, midi);
+      heldNotes.set(midi, spawnVoice(ctx, midi, currentPreset()));
       return;
     }
     // Контекст ещё просыпается: запомним ноту и запустим её после resume().
     pendingHeld.add(midi);
     whenRunning(() => {
-      if (pendingHeld.delete(midi)) spawnHeld(audioCtx, midi);
+      if (pendingHeld.delete(midi)) heldNotes.set(midi, spawnVoice(audioCtx, midi, currentPreset()));
     });
   }
 
@@ -103,15 +187,7 @@ export function useSynth() {
     pendingHeld.delete(midi);
     const voice = heldNotes.get(midi);
     if (!voice) return;
-    const now = audioCtx ? audioCtx.currentTime : 0;
-    try {
-      voice.gain.gain.cancelScheduledValues(now);
-      voice.gain.gain.setValueAtTime(voice.gain.gain.value, now);
-      voice.gain.gain.linearRampToValueAtTime(0.0001, now + 0.08);
-      voice.osc.stop(now + 0.1);
-    } catch (err) {
-      /* игнорируем, если контекст уже закрыт */
-    }
+    voice.release();
     heldNotes.delete(midi);
   }
 
@@ -120,26 +196,16 @@ export function useSynth() {
     Array.from(heldNotes.keys()).forEach(stopHeld);
   }
 
+  // Нота фиксированной длительности — для демонстрации гаммы и проверки звука.
   function playTransient(midi, durationMs) {
     whenRunning((ctx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.value = midiToFrequency(midi);
-
-      const now = ctx.currentTime;
-      const dur = durationMs / 1000;
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.22, now + 0.02);
-      gain.gain.linearRampToValueAtTime(0.0001, now + dur);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + dur + 0.05);
+      const preset = currentPreset();
+      const voice = spawnVoice(ctx, midi, preset);
+      voice.release(ctx.currentTime + durationMs / 1000);
     });
   }
 
+  // Щелчок метронома намеренно не зависит от выбранного инструмента.
   function playClick() {
     whenRunning((ctx) => {
       const osc = ctx.createOscillator();
@@ -158,6 +224,14 @@ export function useSynth() {
     });
   }
 
+  function setInstrument(id) {
+    const preset = findInstrument(id);
+    if (preset.id === state.instrumentId) return;
+    stopAllHeld();
+    state.instrumentId = preset.id;
+    safeSet(preset.id);
+  }
+
   // Полная остановка и освобождение контекста — вызывается при размонтировании.
   function dispose() {
     stopAllHeld();
@@ -169,5 +243,16 @@ export function useSynth() {
     }
   }
 
-  return { state, ensureContext, startHeld, stopHeld, stopAllHeld, playTransient, playClick, dispose };
+  return {
+    state,
+    instruments: INSTRUMENTS,
+    ensureContext,
+    setInstrument,
+    startHeld,
+    stopHeld,
+    stopAllHeld,
+    playTransient,
+    playClick,
+    dispose,
+  };
 }

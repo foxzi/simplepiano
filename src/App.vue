@@ -53,12 +53,23 @@
           </p>
 
           <div class="row row--wrap">
+            <label class="field">
+              <span class="field__label">Инструмент</span>
+              <select
+                aria-label="Выбор тембра инструмента"
+                :value="synth.state.instrumentId"
+                @change="onInstrumentChange($event.target.value)"
+              >
+                <option v-for="item in synth.instruments" :key="item.id" :value="item.id">{{ item.label }}</option>
+              </select>
+            </label>
             <button type="button" class="btn" @click="testSound">Проверить звук</button>
             <span class="audio-badge" :class="'audio-badge--' + audioStatusKind" role="status" aria-live="polite">
               Звук: {{ audioStatusText }}
             </span>
           </div>
 
+          <p class="card__hint">{{ instrumentHint }}</p>
           <p class="card__hint" v-if="synth.state.error">Сообщение браузера: {{ synth.state.error }}</p>
 
           <div class="row row--wrap">
@@ -290,6 +301,17 @@ function testSound() {
   synth.ensureContext();
   synth.playTransient(69, 700);
 }
+
+// Смена тембра: пробуем сразу дать услышать новый инструмент.
+function onInstrumentChange(id) {
+  synth.setInstrument(id);
+  synth.playTransient(60, 900);
+}
+
+const instrumentHint = computed(() => {
+  const current = synth.instruments.find((item) => item.id === synth.state.instrumentId);
+  return current ? current.hint : "";
+});
 
 const audioStatusKind = computed(() => {
   const s = synth.state.status;

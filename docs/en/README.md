@@ -85,6 +85,30 @@ The on-screen piano and all non-MIDI features (Web Audio synth, exercise
 logic, metronome, theory lessons, localStorage persistence) do not depend on
 hardware and were exercised in the browser during development.
 
+## Instrument sound
+
+The "2 On-screen keyboard" card has an "Instrument" dropdown with six presets
+(additive synthesis: a set of harmonics + an ADSR envelope + an optional
+lowpass filter with its own brightness envelope):
+
+- "Piano" (`piano`) — the default sound, a percussive tone that decays.
+- "Electric piano" (`epiano`) — a soft, bell-like Rhodes-style tone.
+- "Organ" (`organ`) — sustains steadily as long as the key is held.
+- "Strings" (`strings`) — a slow attack with a long, gradual release.
+- "Music box" (`musicbox`) — a short, bright, bell-like tone.
+- "Simple synth" (`synth`) — the app's original tone: a single triangle
+  oscillator with no decay.
+
+Presets are defined in `src/constants/instruments.js`. For "Piano" and
+"Music box", higher notes decay faster than lower notes (the
+`decayPitchSemitones` field), similar to acoustic instruments. Switching the
+instrument immediately plays a C4 note so you can hear the new sound, and a
+short hint about its character is shown under the dropdown. The choice is
+persisted in `localStorage` under the key `pianoL.instrument.v1` and restored
+on the next visit. The metronome click is intentionally independent of the
+selected instrument. No audio samples are used — all sound is synthesized in
+the browser via the Web Audio API.
+
 ## The exercise: C major scale, one octave
 
 - Notes (MIDI numbers): C4=60, D4=62, E4=64, F4=65, G4=67, A4=69, B4=71,
@@ -105,7 +129,8 @@ hardware and were exercised in the browser during development.
 
 - The exercise only covers one specific scale (C major, one octave,
   ascending). It's a starting point, not a full curriculum.
-- The synth sound is a simple oscillator-based tone, not a sampled piano.
+- The sound is additive synthesis (see "Instrument sound"), not a sampled
+  real piano.
 - The Web Audio "sound" toggle only affects notes coming from a connected
   MIDI device (to avoid double sound when your hardware has its own synth).
   On-screen piano clicks and the scale demo always produce sound after a user
