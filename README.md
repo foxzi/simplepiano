@@ -15,7 +15,9 @@ Simple Piano — учебная тетрадь для изучения осно�
 - Звук на Web Audio: тембры задаются пресетами аддитивного синтеза,
   сэмплы не используются.
 - Три темы оформления: светлая, тёмная и «тетрадь».
-- Прогресс уроков, выбранная тема и настройки хранятся в `localStorage`.
+- Три языка: русский, английский и испанский — переводятся и интерфейс,
+  и все уроки, и названия нот (До / C / Do).
+- Прогресс уроков, выбранная тема, язык и настройки хранятся в `localStorage`.
 
 Стек: Vue 3 + Vite. Зависимостей времени выполнения, кроме Vue, нет.
 
@@ -44,7 +46,7 @@ docker compose run --rm app npm run build
 docker compose run --rm app npm run build:offline
 ```
 
-Результат — `dist-offline/simple-piano.html` (около 426 КБ). Этот файл
+Результат — `dist-offline/simple-piano.html` (около 564 КБ). Этот файл
 открывается двойным кликом из файлового менеджера, без веб-сервера и без
 интернета: код, стили и шрифты вшиты внутрь HTML.
 
@@ -53,9 +55,11 @@ Safari он недоступен независимо от способа зап
 
 ## Документация
 
-- [Русская документация](docs/ru/README.md) и
+- [Русская документация](docs/ru/README.md),
+  [мультиязычность](docs/ru/I18N.md) и
   [дорожная карта](docs/ru/ROADMAP.md)
-- [English documentation](docs/en/README.md) and
+- [English documentation](docs/en/README.md),
+  [localization](docs/en/I18N.md) and
   [roadmap](docs/en/ROADMAP.md)
 
 ---
@@ -76,7 +80,9 @@ Runs entirely in the browser, with no backend.
 - Web Audio sound: timbres are defined by additive synthesis presets,
   no samples are used.
 - Three themes: light, dark and notebook.
-- Lesson progress, selected theme and settings are kept in `localStorage`.
+- Three languages: Russian, English and Spanish — the interface, every
+  lesson and the note names (До / C / Do) are all translated.
+- Lesson progress, selected theme, language and settings are kept in `localStorage`.
 
 Stack: Vue 3 + Vite. Vue is the only runtime dependency.
 
@@ -106,7 +112,7 @@ Single file offline build:
 docker compose run --rm app npm run build:offline
 ```
 
-The result is `dist-offline/simple-piano.html` (about 426 KB). Open it by
+The result is `dist-offline/simple-piano.html` (about 564 KB). Open it by
 double-clicking in a file manager: no web server and no internet access
 are needed, since code, styles and fonts are inlined into the HTML.
 
@@ -115,7 +121,9 @@ Safari do not support it regardless of how the app is started.
 
 ## Documentation
 
-- [English documentation](docs/en/README.md) and
+- [English documentation](docs/en/README.md),
+  [localization](docs/en/I18N.md) and
   [roadmap](docs/en/ROADMAP.md)
-- [Русская документация](docs/ru/README.md) и
+- [Русская документация](docs/ru/README.md),
+  [мультиязычность](docs/ru/I18N.md) и
   [дорожная карта](docs/ru/ROADMAP.md)

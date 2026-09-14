@@ -54,7 +54,7 @@ inlined into the CSS as `data:` URIs. The build goes into the
 `dist-offline/` directory, then the `scripts/build-offline.mjs` script
 inlines the resulting JS and CSS directly into the HTML and removes the
 intermediate files. The result is a single file,
-`dist-offline/simple-piano.html`, about 426 KB in size.
+`dist-offline/simple-piano.html`, about 564 KB in size.
 
 That file opens with a double-click from a file manager (the `file://`
 protocol), no web server needed. Inlining is required because the browser
@@ -113,6 +113,18 @@ persisted in `localStorage` and restored on the next visit; the correct
 theme is applied before the first paint to avoid a flash of the wrong theme.
 If no preference is stored yet, the app falls back to the browser's
 `prefers-color-scheme`.
+
+## Languages
+
+Next to the theme switcher there is a language switcher: RU, EN, ES. Not
+only the interface labels are translated, but also all 32 lessons, the
+theory reference and the note names (До / C / Do). The choice is stored in
+`localStorage` under the key `pianoL.locale.v1`; on the first visit the
+language comes from the browser settings, falling back to Russian.
+
+The lesson structure (notes, practice types, staff) is declared once and
+translations are laid over it. See [I18N.md](./I18N.md) for the details and
+the translation pack format.
 
 ## Fonts
 
