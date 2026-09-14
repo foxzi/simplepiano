@@ -36,7 +36,7 @@ const INTERVAL_NAMES = {
   12: "октава",
 };
 
-export function useLessonTask(practice, { onComplete } = {}) {
+export function useLessonTask(practice, { onComplete, repeats } = {}) {
   const notes = practice.notes || [];
   const chords = practice.chords || [];
   const beats = practice.beats || null;
@@ -50,6 +50,12 @@ export function useLessonTask(practice, { onComplete } = {}) {
           ? practice.rounds
           : notes.length;
 
+  // Сколько кругов нужно пройти: значение выбирает пользователь (см. useRepeats).
+  const passes = () => {
+    const value = repeats ? repeats.value : 1;
+    return Number.isInteger(value) && value > 0 ? value : 1;
+  };
+
   // Ритм: доля, на которой была засчитана первая нота, — от неё считаем рисунок.
   let baseBeat = null;
   let countedBeat = -1;
@@ -61,6 +67,7 @@ export function useLessonTask(practice, { onComplete } = {}) {
     running: false,
     done: false,
     index: 0, // сколько шагов засчитано
+    round: 0, // сколько кругов пройдено целиком
     errors: 0,
     feedback: "",
     hits: [], // засчитанные ноты (для set, explore и текущего аккорда)
@@ -116,6 +123,7 @@ export function useLessonTask(practice, { onComplete } = {}) {
   function resetState() {
     state.done = false;
     state.index = 0;
+    state.round = 0;
     state.errors = 0;
     state.hits = [];
     state.inTime = 0;
@@ -145,11 +153,25 @@ export function useLessonTask(practice, { onComplete } = {}) {
     state.feedback = "";
   }
 
+  // Круг пройден: либо начинаем следующий, либо задание выполнено.
   function finish() {
-    state.done = true;
-    state.running = false;
-    state.feedback = practice.doneText || "Отлично, задание выполнено!";
-    onComplete && onComplete();
+    state.round += 1;
+    if (state.round >= passes()) {
+      state.done = true;
+      state.running = false;
+      state.feedback = practice.doneText || "Отлично, задание выполнено!";
+      onComplete && onComplete();
+      return;
+    }
+
+    // Следующий круг: прогресс внутри круга обнуляем, ошибки копятся дальше.
+    state.index = 0;
+    state.hits = [];
+    baseBeat = null;
+    countedBeat = -1;
+    chordBuffer = [];
+    state.feedback = `Круг ${state.round} из ${passes()} пройден — играйте ещё раз.`;
+    if (practice.type === "ear") window.setTimeout(nextEarRound, 700);
   }
 
   // Попадание в долю метронома: считаем расстояние до ближайшего щелчка.
@@ -328,5 +350,16 @@ export function useLessonTask(practice, { onComplete } = {}) {
     if (state.index >= total) finish();
   }
 
-  return { state, total, expected, expectedText, start, reset, handleNote, demo, playEar };
+  return {
+    state,
+    total,
+    passes: computed(() => passes()),
+    expected,
+    expectedText,
+    start,
+    reset,
+    handleNote,
+    demo,
+    playEar,
+  };
 }

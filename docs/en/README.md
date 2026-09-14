@@ -234,6 +234,19 @@ The keys you need are highlighted on the shared keyboard (amber dot), the
 ones already played turn green. Tasks with fingering show finger numbers on
 the keys.
 
+### Number of rounds
+
+Tasks are short, so each one has a "rounds" selector: 1, 2, 3, 5 or 8. The
+task has to be played that many times in a row and is only marked as done
+after the last round. Between rounds the step counter resets while errors
+keep accumulating - the progress bar and the "round N of M" line show the
+overall position.
+
+The choice is stored per practice in `localStorage` under the key
+`pianoL.repeats.v1` (shape: `{"lesson-id:practice-id": 3}`), so it survives
+a reload. The number of rounds can only be changed while the task is not
+running.
+
 ### Lesson progress
 
 A lesson is complete when all of its practices are done. The list of

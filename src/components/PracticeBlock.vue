@@ -23,6 +23,13 @@
       <button type="button" class="btn" v-if="practice.type === 'ear'" :disabled="!state.running" @click="playEar">
         Повторить звук
       </button>
+
+      <label class="repeats">
+        <span class="repeats__label">Кругов:</span>
+        <select class="repeats__select" v-model.number="repeats" :disabled="state.running">
+          <option v-for="option in REPEAT_OPTIONS" :key="option" :value="option">{{ option }}</option>
+        </select>
+      </label>
     </div>
 
     <p class="practice__expected">{{ expectedText }}</p>
@@ -33,6 +40,7 @@
 
     <p class="practice__meta">
       <span>Шаг: <strong>{{ state.index }}</strong> / {{ total }}</span>
+      <span v-if="passes > 1">Круг: <strong>{{ currentRound }}</strong> / {{ passes }}</span>
       <span>Ошибки: <strong>{{ state.errors }}</strong></span>
       <span v-if="practice.type === 'rhythm'">В долю: <strong>{{ state.inTime }}</strong></span>
     </p>
@@ -46,6 +54,7 @@ import { computed, onUnmounted, watch } from "vue";
 
 import MusicStaff from "./MusicStaff.vue";
 import { useLessonTask } from "../composables/useLessonTask";
+import { getRepeats, setRepeats, REPEAT_OPTIONS } from "../composables/useRepeats";
 import { onNote, setHighlight, clearHighlight, activeOwner } from "../stores/keyboard";
 
 const props = defineProps({
@@ -54,9 +63,16 @@ const props = defineProps({
 });
 const emit = defineEmits(["completed"]);
 
+// Сколько раз подряд играть задание: выбор пользователя переживает перезагрузку.
+const repeats = computed({
+  get: () => getRepeats(props.ownerId),
+  set: (value) => setRepeats(props.ownerId, value),
+});
+
 const {
   state,
   total,
+  passes,
   expected,
   expectedText,
   start: startTask,
@@ -64,9 +80,20 @@ const {
   handleNote,
   demo,
   playEar,
-} = useLessonTask(props.practice, { onComplete: () => emit("completed", props.practice.id) });
+} = useLessonTask(props.practice, {
+  onComplete: () => emit("completed", props.practice.id),
+  repeats,
+});
 
-const percent = computed(() => (total ? Math.round((state.index / total) * 100) : 0));
+// Прогресс считаем по всем кругам сразу, чтобы полоса не откатывалась назад.
+const percent = computed(() => {
+  const steps = total * passes.value;
+  if (!steps) return 0;
+  if (state.done) return 100;
+  return Math.round(((state.round * total + state.index) / steps) * 100);
+});
+
+const currentRound = computed(() => Math.min(state.round + (state.done ? 0 : 1), passes.value));
 
 // «Послушать» бессмысленно там, где играть нужно наугад или что угодно.
 const canListen = computed(

@@ -1098,6 +1098,24 @@ output {
   color: var(--text-soft);
 }
 
+.repeats {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+
+.repeats__select {
+  min-width: 72px;
+  padding: 8px 10px;
+}
+
+.repeats__select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .pager {
   display: flex;
   justify-content: space-between;
