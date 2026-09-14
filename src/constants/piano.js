@@ -6,8 +6,9 @@ export const NOTE_NAMES_RU = [
   "Фа\u266F", "Соль", "Соль\u266F", "Ля", "Ля\u266F", "Си",
 ];
 
-// Диапазон видимой клавиатуры: до 4-й октавы (MIDI 60) .. до 6-й октавы (MIDI 84)
-export const PIANO_MIN_MIDI = 60;
+// Диапазон видимой клавиатуры: до 3-й октавы (MIDI 48) .. до 6-й октавы (MIDI 84).
+// Нижняя октава нужна левой руке и урокам басового ключа.
+export const PIANO_MIN_MIDI = 48;
 export const PIANO_MAX_MIDI = 84;
 
 // Смещения внутри октавы для белых и чёрных клавиш
@@ -32,4 +33,23 @@ export function noteName(midi) {
 
 export function midiToFrequency(midi) {
   return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+// --- Помощники для нотного стана ---
+
+// Ступень внутри октавы для каждой из двенадцати клавиш: чёрная клавиша
+// записывается на той же линейке, что и белая слева от неё, плюс диез.
+const DEGREE_IN_OCTAVE = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+const BLACK_SET = new Set(BLACK_OFFSETS);
+
+export function isBlackKey(midi) {
+  return BLACK_SET.has(((midi % 12) + 12) % 12);
+}
+
+// Номер ступени, считая от до нулевой октавы: соседние линейки и промежутки
+// отличаются ровно на единицу, поэтому по нему удобно считать высоту на стане.
+export function diatonicStep(midi) {
+  const offset = ((midi % 12) + 12) % 12;
+  const octave = Math.floor(midi / 12) - 1;
+  return octave * 7 + DEGREE_IN_OCTAVE[offset];
 }
