@@ -1139,6 +1139,47 @@ output {
   box-shadow: var(--shadow-lg);
 }
 
+.workbench__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px);
+}
+
+.workbench__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--accent-strong);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.workbench__toggle:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.workbench__chevron {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.workbench__bar-info {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
 .workbench__inner {
   max-width: 1080px;
   margin: 0 auto;

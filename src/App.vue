@@ -19,8 +19,24 @@
     </main>
 
     <!-- Инструменты и клавиатура общие для всех страниц -->
-    <section class="workbench" aria-label="Клавиатура и настройки звука">
-      <div class="workbench__inner">
+    <section class="workbench" :class="{ 'is-collapsed': collapsed }" aria-label="Клавиатура и настройки звука">
+      <div class="workbench__bar">
+        <button
+          type="button"
+          class="workbench__toggle"
+          :aria-expanded="!collapsed"
+          aria-controls="workbench-body"
+          @click="toggle"
+        >
+          <span class="workbench__chevron" aria-hidden="true">{{ collapsed ? "▲" : "▼" }}</span>
+          {{ collapsed ? "Показать клавиатуру и настройки" : "Свернуть клавиатуру и настройки" }}
+        </button>
+        <span class="workbench__bar-info" v-if="collapsed">
+          {{ metronome.state.bpm }} уд/мин<template v-if="metronome.state.running"> · метроном идёт</template>
+        </span>
+      </div>
+
+      <div class="workbench__inner" id="workbench-body" v-show="!collapsed">
         <div class="row row--wrap workbench__controls">
           <label class="field">
             <span class="field__label">Темп, уд/мин</span>
@@ -122,15 +138,18 @@ import ScalePage from "./pages/ScalePage.vue";
 
 import { useMidi } from "./composables/useMidi";
 import { useTheme } from "./composables/useTheme";
+import { useWorkbench } from "./composables/useWorkbench";
 import { synth, metronome } from "./stores/audio";
 import { activeNotes, expectedNotes, doneNotes, keyLabels, setActive, emitNote } from "./stores/keyboard";
 import { route } from "./router";
 
 const { theme, setTheme } = useTheme();
+const { collapsed, toggle, expand } = useWorkbench();
 const soundEnabled = ref(false);
 
 const midi = useMidi({
   onNoteOn(note) {
+    expand(); // игра на MIDI-клавиатуре возвращает панель на экран
     setActive(note, true);
     if (soundEnabled.value) synth.startHeld(note);
     emitNote(note);
