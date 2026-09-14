@@ -34,6 +34,49 @@ The dev server binds only to `127.0.0.1` on the host for safety. If port
 5174 is already used by another project on your machine, change the host
 port in `compose.yaml` (the `ports:` mapping).
 
+A single-file offline build (output: `dist-offline/piano-l.html`, opens
+without a server and without internet access) is described below in
+"Offline build (single file)".
+
+## Offline build (single file)
+
+Besides the regular production build, there is a command that bundles the
+app into a single self-contained HTML file:
+
+```bash
+docker compose run --rm app npm run build:offline
+```
+
+The command runs `vite build` with the `OFFLINE_BUILD=1` environment
+variable. In `vite.config.js` this variable enables `base: "./"` and lifts
+the `assetsInlineLimit` restriction, so all assets, including fonts, end up
+inlined into the CSS as `data:` URIs. The build goes into the
+`dist-offline/` directory, then the `scripts/build-offline.mjs` script
+inlines the resulting JS and CSS directly into the HTML and removes the
+intermediate files. The result is a single file,
+`dist-offline/piano-l.html`, about 422 KB in size.
+
+That file opens with a double-click from a file manager (the `file://`
+protocol), no web server needed. Inlining is required because the browser
+does not execute external `<script type="module" src="...">` tags when a
+page is opened over `file://` (CORS restrictions, `null` origin) — all the
+code has to live inside the HTML itself.
+
+Verified in headless Chrome by opening `dist-offline/piano-l.html` over
+`file://` with no network access: the app renders, there are no console
+errors, `window.isSecureContext === true`, `navigator.requestMIDIAccess` is
+available (so MIDI keyboards work), Web Audio works, and `localStorage`
+works (theme, lesson progress, and the rounds choice are all persisted).
+
+As everywhere else, Web MIDI is only supported in Chrome and other
+Chromium-based browsers — Firefox and Safari do not expose Web MIDI
+regardless of how the page is opened (see "Web MIDI: HTTPS/localhost and
+browser restrictions" below).
+
+The `dist-offline/` directory is added to `.gitignore`. The regular build
+(`npm run build`) and dev mode (`npm run dev`) are unchanged — there, fonts
+are still loaded as separate `.woff2` files.
+
 ## Web MIDI: HTTPS/localhost and browser restrictions
 
 The Web MIDI API (`navigator.requestMIDIAccess`) is only available in a
@@ -70,6 +113,30 @@ persisted in `localStorage` and restored on the next visit; the correct
 theme is applied before the first paint to avoid a flash of the wrong theme.
 If no preference is stored yet, the app falls back to the browser's
 `prefers-color-scheme`.
+
+## Fonts
+
+Fonts are bundled locally with the app and are not loaded from the
+internet. They used to be loaded from Google Fonts via a `<link>` and a
+`preconnect` in `index.html`; those tags have been removed, and the font
+files now live in the repository, under `src/assets/fonts/` (9 `.woff2`
+files, about 147 KB total), declared in `src/fonts.css`, which is imported
+in `src/main.js` before `src/style.css`. The set:
+
+- Fraunces Variable (latin);
+- Manrope Variable (latin and cyrillic);
+- IBM Plex Mono, weights 400/500/600 (latin and cyrillic).
+
+The fonts come from the `@fontsource` packages, licensed under OFL. Fraunces
+does not include cyrillic glyphs (the font itself has no cyrillic), so
+Russian headings fall back to Georgia — this was also the case with Google
+Fonts, the behavior is unchanged. The notebook theme (the default)
+intentionally uses Georgia/Iowan Old Style, while Manrope and Fraunces are
+used in the light and dark themes.
+
+Thanks to the local fonts, the app no longer needs internet access — not
+for the regular build and dev server, and especially not for the offline
+build (see "Offline build (single file)" above).
 
 ## No physical MIDI hardware was used to verify this build
 
