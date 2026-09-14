@@ -17,8 +17,6 @@
 export const INSTRUMENTS = [
   {
     id: "piano",
-    label: "Фортепиано",
-    hint: "Ударный тембр с затуханием и спадом яркости — ближе всего к акустическому роялю.",
     gain: 0.3,
     attack: 0.004,
     decay: 3.2,
@@ -37,8 +35,6 @@ export const INSTRUMENTS = [
   },
   {
     id: "epiano",
-    label: "Электропиано",
-    hint: "Мягкий колокольчиковый тембр в духе родес-пиано.",
     gain: 0.32,
     attack: 0.005,
     decay: 2.4,
@@ -55,8 +51,6 @@ export const INSTRUMENTS = [
   },
   {
     id: "organ",
-    label: "Орган",
-    hint: "Звук держится ровно, пока нажата клавиша, — удобно слушать интервалы и аккорды.",
     gain: 0.2,
     attack: 0.02,
     decay: 0.1,
@@ -72,8 +66,6 @@ export const INSTRUMENTS = [
   },
   {
     id: "strings",
-    label: "Струнные",
-    hint: "Плавное нарастание и долгое послезвучие — хорошо для работы над legato.",
     gain: 0.16,
     attack: 0.22,
     decay: 0.6,
@@ -88,8 +80,6 @@ export const INSTRUMENTS = [
   },
   {
     id: "musicbox",
-    label: "Музыкальная шкатулка",
-    hint: "Короткий звонкий звук — заметны даже самые быстрые ноты.",
     gain: 0.3,
     attack: 0.002,
     decay: 1.1,
@@ -106,8 +96,6 @@ export const INSTRUMENTS = [
   },
   {
     id: "synth",
-    label: "Простой синтезатор",
-    hint: "Исходный чистый тон приложения: один треугольный осциллятор без затухания.",
     gain: 0.22,
     attack: 0.02,
     decay: 0.1,

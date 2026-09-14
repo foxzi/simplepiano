@@ -1,10 +1,18 @@
 // Константы клавиатуры и упражнения — гамма До мажор, одна октава.
 
-// Русские названия нот (сольфеджио), индекс = midi % 12, До = 0
-export const NOTE_NAMES_RU = [
-  "До", "До\u266F", "Ре", "Ре\u266F", "Ми", "Фа",
-  "Фа\u266F", "Соль", "Соль\u266F", "Ля", "Ля\u266F", "Си",
-];
+import { locale } from "../i18n";
+
+// Названия нот по локалям, индекс = midi % 12, До = 0.
+// Русский и испанский используют сольфеджио, английский — буквенные названия.
+export const NOTE_NAMES = {
+  ru: ["До", "До\u266F", "Ре", "Ре\u266F", "Ми", "Фа", "Фа\u266F", "Соль", "Соль\u266F", "Ля", "Ля\u266F", "Си"],
+  en: ["C", "C\u266F", "D", "D\u266F", "E", "F", "F\u266F", "G", "G\u266F", "A", "A\u266F", "B"],
+  es: ["Do", "Do\u266F", "Re", "Re\u266F", "Mi", "Fa", "Fa\u266F", "Sol", "Sol\u266F", "La", "La\u266F", "Si"],
+};
+
+// Старое имя сохранено: на него опираются прежние импорты.
+export const NOTE_NAMES_RU = NOTE_NAMES.ru;
+
 
 // Диапазон видимой клавиатуры: до 3-й октавы (MIDI 48) .. до 6-й октавы (MIDI 84).
 // Нижняя октава нужна левой руке и урокам басового ключа.
@@ -25,10 +33,15 @@ export const FINGERING = {
 export const DEMO_STEP_MS = 480;
 export const DEMO_NOTE_MS = 420;
 
+// Название ноты без октавы — для подписей на клавишах.
+export function noteLabel(midi) {
+  const names = NOTE_NAMES[locale.value] || NOTE_NAMES.ru;
+  return names[((midi % 12) + 12) % 12];
+}
+
 export function noteName(midi) {
-  const name = NOTE_NAMES_RU[((midi % 12) + 12) % 12];
   const octave = Math.floor(midi / 12) - 1;
-  return name + octave;
+  return noteLabel(midi) + octave;
 }
 
 export function midiToFrequency(midi) {
