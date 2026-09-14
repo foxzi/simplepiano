@@ -1,22 +1,25 @@
 <template>
   <article class="page" v-if="lesson">
     <nav class="crumbs">
-      <a href="#/">Оглавление</a>
+      <a href="#/">{{ t("lesson.crumbHome") }}</a>
       <span aria-hidden="true">/</span>
-      <span>Урок {{ number }}</span>
+      <span>{{ t("lesson.crumbLesson", { number }) }}</span>
     </nav>
 
     <header class="page__head">
       <p class="page__kicker">
-        <template v-if="module">{{ module.title }} · </template>Урок {{ number }} · темы {{ lesson.topics.join(", ") }}
+        <template v-if="moduleTitle">
+          {{ t("lesson.kicker", { module: moduleTitle, number, topics: lesson.topics.join(", ") }) }}
+        </template>
+        <template v-else>{{ t("lesson.kickerNoModule", { number, topics: lesson.topics.join(", ") }) }}</template>
       </p>
       <h1 class="page__title">{{ lesson.title }}</h1>
       <p class="page__summary">{{ lesson.summary }}</p>
-      <p class="lesson-badge" v-if="progress.isDone(lesson.id)">Урок пройден</p>
+      <p class="lesson-badge" v-if="progress.isDone(lesson.id)">{{ t("lesson.done") }}</p>
     </header>
 
     <section class="card card--wide">
-      <h2 class="card__title">Теория</h2>
+      <h2 class="card__title">{{ t("lesson.theoryTitle") }}</h2>
       <template v-for="(block, i) in lesson.blocks" :key="i">
         <p v-if="block.type === 'text'" class="theory__text">{{ block.text }}</p>
         <ul v-else-if="block.type === 'list'" class="theory__list">
@@ -55,10 +58,8 @@
     </section>
 
     <section class="card card--wide">
-      <h2 class="card__title">Практика</h2>
-      <p class="card__hint">
-        Играйте на MIDI-клавиатуре или мышью по клавишам внизу страницы. Нужные клавиши подсвечиваются.
-      </p>
+      <h2 class="card__title">{{ t("lesson.practiceTitle") }}</h2>
+      <p class="card__hint">{{ t("lesson.practiceHint") }}</p>
       <PracticeBlock
         v-for="practice in lesson.practices"
         :key="practice.id"
@@ -69,16 +70,18 @@
     </section>
 
     <nav class="pager">
-      <a class="btn" v-if="prev" :href="lessonHref(prev.id)">← {{ prev.title }}</a>
+      <a class="btn" v-if="prev" :href="lessonHref(prev.id)">&larr; {{ prev.title }}</a>
       <span v-else></span>
-      <a class="btn btn--primary" v-if="next" :href="lessonHref(next.id)">{{ next.title }} →</a>
-      <a class="btn" v-else href="#/">К оглавлению</a>
+      <a class="btn btn--primary" v-if="next" :href="lessonHref(next.id)">{{ next.title }} &rarr;</a>
+      <a class="btn" v-else href="#/">{{ t("lesson.toContents") }}</a>
     </nav>
   </article>
 
   <article class="page" v-else>
-    <h1 class="page__title">Урок не найден</h1>
-    <p class="page__summary">Возможно, ссылка устарела. <a href="#/">Вернитесь к оглавлению</a>.</p>
+    <h1 class="page__title">{{ t("lesson.notFoundTitle") }}</h1>
+    <p class="page__summary">
+      {{ t("lesson.notFoundText") }} <a href="#/">{{ t("lesson.notFoundLink") }}</a>.
+    </p>
   </article>
 </template>
 
@@ -88,9 +91,11 @@ import { computed, reactive, watch } from "vue";
 import MusicStaff from "../components/MusicStaff.vue";
 import PracticeBlock from "../components/PracticeBlock.vue";
 import { synth } from "../stores/audio";
-import { LESSONS, MODULES, findLesson, lessonIndex } from "../constants/lessons";
+import { LESSONS, findLesson, lessonIndex } from "../constants/lessons";
+import { localizeLesson, localizeLessonMeta } from "../constants/lessons/localize";
 import { useProgress } from "../composables/useProgress";
 import { lessonHref } from "../router";
+import { t, locale } from "../i18n";
 
 const props = defineProps({ id: { type: String, required: true } });
 
@@ -106,11 +111,22 @@ function playVariant(variant) {
     window.setTimeout(() => group.forEach((midi) => synth.playTransient(midi, hold, gain)), i * step);
   });
 }
-const lesson = computed(() => findLesson(props.id));
+const lesson = computed(() => {
+  locale.value;
+  return localizeLesson(findLesson(props.id));
+});
 const number = computed(() => lessonIndex(props.id) + 1);
-const module = computed(() => MODULES.find((item) => item.id === lesson.value?.module) || null);
-const prev = computed(() => LESSONS[lessonIndex(props.id) - 1] || null);
-const next = computed(() => LESSONS[lessonIndex(props.id) + 1] || null);
+const moduleTitle = computed(() => (lesson.value?.module ? t(`modules.${lesson.value.module}.title`) : ""));
+const prev = computed(() => {
+  locale.value;
+  const raw = LESSONS[lessonIndex(props.id) - 1] || null;
+  return raw ? localizeLessonMeta(raw) : null;
+});
+const next = computed(() => {
+  locale.value;
+  const raw = LESSONS[lessonIndex(props.id) + 1] || null;
+  return raw ? localizeLessonMeta(raw) : null;
+});
 
 // Урок считается пройденным, когда выполнены все его практики.
 const finished = reactive(new Set());

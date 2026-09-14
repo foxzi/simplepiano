@@ -3,15 +3,13 @@
     <h3 class="practice__title">{{ practice.title }}</h3>
     <p class="practice__instruction">{{ practice.instruction }}</p>
     <p class="practice__instruction" v-if="practice.type === 'sequence'">
-      Автоматически проверяется только порядок нот. Ритм, длительности, динамику и технику рук оценивайте самостоятельно.
+      {{ t("practice.limitsSequence") }}
     </p>
     <p class="practice__instruction" v-else-if="practice.type === 'rhythm'">
-      Проверяются ноты и моменты вступлений по щелчкам. Удержание клавиш и тишина в паузах не проверяются.
-      Неточности отмечаются, но не мешают завершить тренировку: оцените счётчик «В долю» и ошибки.
+      {{ t("practice.limitsRhythm") }}
     </p>
     <p class="practice__instruction" v-else-if="practice.type === 'chord'">
-      Проверяется набор нот в пределах 1,2 секунды — это допуск для тренировки, а не оценка одновременности.
-      Играйте ноты вместе; удержание клавиш и работу рук оценивайте самостоятельно.
+      {{ t("practice.limitsChord") }}
     </p>
 
     <div class="staff-scroll" v-if="practice.staff">
@@ -27,16 +25,16 @@
 
     <div class="row row--wrap">
       <button type="button" class="btn btn--primary" @click="start">
-        {{ state.running ? "Начать заново" : state.done ? "Пройти ещё раз" : "Начать" }}
+        {{ state.running ? t("practice.restart") : state.done ? t("practice.again") : t("practice.start") }}
       </button>
-      <button type="button" class="btn" :disabled="!state.running && !state.done" @click="stop">Сбросить</button>
-      <button type="button" class="btn" v-if="canListen" @click="demo">Послушать</button>
+      <button type="button" class="btn" :disabled="!state.running && !state.done" @click="stop">{{ t("practice.reset") }}</button>
+      <button type="button" class="btn" v-if="canListen" @click="demo">{{ t("practice.listen") }}</button>
       <button type="button" class="btn" v-if="practice.type === 'ear'" :disabled="!state.running" @click="playEar">
-        Повторить звук
+        {{ t("practice.replaySound") }}
       </button>
 
       <label class="repeats">
-        <span class="repeats__label">Кругов:</span>
+        <span class="repeats__label">{{ t("practice.rounds") }}</span>
         <select class="repeats__select" v-model.number="repeats" :disabled="state.running">
           <option v-for="option in REPEAT_OPTIONS" :key="option" :value="option">{{ option }}</option>
         </select>
@@ -50,10 +48,10 @@
     </div>
 
     <p class="practice__meta">
-      <span>Шаг: <strong>{{ state.index }}</strong> / {{ total }}</span>
-      <span v-if="passes > 1">Круг: <strong>{{ currentRound }}</strong> / {{ passes }}</span>
-      <span>Ошибки: <strong>{{ state.errors }}</strong></span>
-      <span v-if="practice.type === 'rhythm'">В долю: <strong>{{ state.inTime }}</strong></span>
+      <span v-html="t('practice.step', { index: state.index, total })"></span>
+      <span v-if="passes > 1" v-html="t('practice.round', { round: currentRound, passes })"></span>
+      <span v-html="t('practice.errors', { errors: state.errors })"></span>
+      <span v-if="practice.type === 'rhythm'" v-html="t('practice.inTime', { count: state.inTime })"></span>
     </p>
 
     <p class="status" :class="statusClass" role="status" aria-live="polite">{{ state.feedback }}</p>
@@ -67,6 +65,7 @@ import MusicStaff from "./MusicStaff.vue";
 import { useLessonTask } from "../composables/useLessonTask";
 import { getRepeats, setRepeats, REPEAT_OPTIONS } from "../composables/useRepeats";
 import { onNote, setHighlight, clearHighlight, activeOwner } from "../stores/keyboard";
+import { t } from "../i18n";
 
 const props = defineProps({
   practice: { type: Object, required: true },
@@ -125,10 +124,7 @@ const staffDone = computed(() => {
   return staffCurrent.value < 0 ? 0 : staffCurrent.value;
 });
 
-const statusClass = computed(() => {
-  if (state.done) return "status--ok";
-  return /^(Верно|В долю!|Аккорд взят)/.test(state.feedback) ? "status--ok" : "";
-});
+const statusClass = computed(() => (state.feedbackKind ? "status--" + state.feedbackKind : ""));
 
 function pushHighlight() {
   setHighlight(props.ownerId, {

@@ -1,5 +1,5 @@
 <template>
-  <div class="piano" role="group" aria-label="Клавиатура фортепиано, две октавы от до четвёртой октавы">
+  <div class="piano" role="group" :aria-label="t('piano.aria')">
     <button
       v-for="key in keys"
       :key="key.midi"
@@ -21,6 +21,7 @@
 <script setup>
 import { computed } from "vue";
 import { PIANO_MIN_MIDI, PIANO_MAX_MIDI, BLACK_OFFSETS, noteName } from "../constants/piano";
+import { t } from "../i18n";
 
 // Состояние (нажатия, подсветка, подписи) берём из общего хранилища:
 // клавиатура одна на всё приложение, а управляют ей страницы уроков.

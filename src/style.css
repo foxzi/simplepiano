@@ -226,6 +226,50 @@ a {
   background: linear-gradient(135deg, #f4ecd8, #2f6b48);
 }
 
+/* ---------- locale switcher ---------- */
+
+.topbar__switchers {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.locale-switcher {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+
+.locale-switcher__btn {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.locale-switcher__btn:hover {
+  color: var(--text);
+}
+
+.locale-switcher__btn.is-active {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+.locale-switcher__btn:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+
 /* ---------- layout ---------- */
 
 .layout {

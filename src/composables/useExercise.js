@@ -3,6 +3,7 @@
 
 import { reactive } from "vue";
 import { EXERCISE_SEQUENCE, FINGERING } from "../constants/piano";
+import { t } from "../i18n";
 
 const STORAGE_KEY = "pianoL.progress.v1";
 
@@ -24,6 +25,10 @@ function safeStorageSet(value) {
   }
 }
 
+function handLabel(hand) {
+  return hand === "right" ? t("exercise.handRight") : t("exercise.handLeft");
+}
+
 export function useExercise({ noteName, onStart } = {}) {
   const state = reactive({
     active: false,
@@ -31,7 +36,7 @@ export function useExercise({ noteName, onStart } = {}) {
     errors: 0,
     hand: "right",
     expectedMidi: null,
-    expectedText: "Нажмите «Начать», чтобы приступить к упражнению.",
+    expectedText: t("exercise.pressStart"),
     feedback: "\u00a0",
     feedbackKind: "",
     result: "",
@@ -51,8 +56,7 @@ export function useExercise({ noteName, onStart } = {}) {
     }
     const midi = EXERCISE_SEQUENCE[state.index];
     const finger = FINGERING[state.hand][state.index];
-    const handLabel = state.hand === "right" ? "правой" : "левой";
-    state.expectedText = `Играйте: ${noteName(midi)} (палец ${finger} ${handLabel} руки)`;
+    state.expectedText = t("exercise.playNote", { note: noteName(midi), finger, hand: handLabel(state.hand) });
     state.expectedMidi = midi;
   }
 
@@ -63,7 +67,7 @@ export function useExercise({ noteName, onStart } = {}) {
     state.errors = 0;
     state.result = "";
     state.resultKind = "";
-    state.feedback = "Упражнение начато. Играйте первую ноту.";
+    state.feedback = t("exercise.started");
     state.feedbackKind = "";
     updateExpected();
   }
@@ -76,7 +80,7 @@ export function useExercise({ noteName, onStart } = {}) {
     state.feedback = "\u00a0";
     state.feedbackKind = "";
     state.result = "";
-    state.expectedText = "Нажмите «Начать», чтобы приступить к упражнению.";
+    state.expectedText = t("exercise.pressStart");
     state.expectedMidi = null;
     renderStoredResult();
   }
@@ -91,13 +95,13 @@ export function useExercise({ noteName, onStart } = {}) {
       if (state.index >= EXERCISE_SEQUENCE.length) {
         finish();
       } else {
-        state.feedback = "Верно! Играйте следующую ноту.";
+        state.feedback = t("exercise.correct");
         state.feedbackKind = "ok";
         updateExpected();
       }
     } else {
       state.errors++;
-      state.feedback = `Не та нота (сыграно ${noteName(midi)}, нужно ${noteName(expected)}). Попробуйте ещё раз.`;
+      state.feedback = t("exercise.wrong", { played: noteName(midi), expected: noteName(expected) });
       state.feedbackKind = "error";
     }
   }
@@ -105,8 +109,8 @@ export function useExercise({ noteName, onStart } = {}) {
   function finish() {
     state.active = false;
     state.expectedMidi = null;
-    state.expectedText = "Гамма сыграна полностью!";
-    state.feedback = "Упражнение завершено.";
+    state.expectedText = t("exercise.scaleComplete");
+    state.feedback = t("exercise.finished");
     state.feedbackKind = "ok";
 
     const record = {
@@ -122,10 +126,9 @@ export function useExercise({ noteName, onStart } = {}) {
   }
 
   function renderResult(record, saved) {
-    const handLabel = record.hand === "right" ? "правой" : "левой";
-    let text = `Результат: гамма до мажор пройдена ${handLabel} рукой, ошибок: ${record.errors}.`;
+    let text = t("exercise.result", { hand: handLabel(record.hand), errors: record.errors });
     if (!saved) {
-      text += " (Не удалось сохранить результат в этом браузере.)";
+      text += " " + t("exercise.notSaved");
     }
     state.result = text;
     state.resultKind = "ok";
@@ -135,14 +138,13 @@ export function useExercise({ noteName, onStart } = {}) {
     const stored = safeStorageGet();
     if (stored && stored.cMajor && stored.cMajor.completed) {
       const record = stored.cMajor;
-      const handLabel = record.hand === "right" ? "правой" : "левой";
       let date = "";
       try {
         date = new Date(record.completedAt).toLocaleString("ru-RU");
       } catch (err) {
         date = record.completedAt;
       }
-      state.result = `Ранее пройдено (${date}): ${handLabel} рукой, ошибок: ${record.errors}.`;
+      state.result = t("exercise.previousResult", { date, hand: handLabel(record.hand), errors: record.errors });
       state.resultKind = "";
     }
   }

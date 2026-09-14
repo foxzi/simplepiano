@@ -3,23 +3,27 @@
     <header class="topbar">
       <a class="topbar__brand" href="#/">
         <span class="topbar__mark" aria-hidden="true">&#9834;</span>
-        <span class="topbar__title">Simple Piano</span>
+        <span class="topbar__title">{{ t("app.brand") }}</span>
       </a>
-      <nav class="topbar__nav" aria-label="Основная навигация">
-        <a href="#/" :class="{ 'is-active': route.name === 'home' }">Оглавление</a>
-        <a href="#/scale" :class="{ 'is-active': route.name === 'scale' }">Гамма</a>
+      <nav class="topbar__nav" :aria-label="t('nav.label')">
+        <a href="#/" :class="{ 'is-active': route.name === 'home' }">{{ t("nav.home") }}</a>
+        <a href="#/scale" :class="{ 'is-active': route.name === 'scale' }">{{ t("nav.scale") }}</a>
       </nav>
-      <ThemeSwitcher :theme="theme" @update:theme="setTheme" />
+      <div class="topbar__switchers">
+        <ThemeSwitcher :theme="theme" @update:theme="setTheme" />
+        <LocaleSwitcher />
+      </div>
     </header>
 
+    <!-- Ключ с локалью: тексты заданий хранятся в состоянии, поэтому при смене языка страницу пересоздаём -->
     <main class="layout">
-      <HomePage v-if="route.name === 'home'" />
-      <LessonPage v-else-if="route.name === 'lesson'" :id="route.id" :key="route.id" />
-      <ScalePage v-else />
+      <HomePage v-if="route.name === 'home'" :key="locale" />
+      <LessonPage v-else-if="route.name === 'lesson'" :id="route.id" :key="locale + ':' + route.id" />
+      <ScalePage v-else :key="locale" />
     </main>
 
     <!-- Инструменты и клавиатура общие для всех страниц -->
-    <section class="workbench" :class="{ 'is-collapsed': collapsed }" aria-label="Клавиатура и настройки звука">
+    <section class="workbench" :class="{ 'is-collapsed': collapsed }" :aria-label="t('workbench.region')">
       <div class="workbench__bar">
         <button
           type="button"
@@ -29,17 +33,17 @@
           @click="toggle"
         >
           <span class="workbench__chevron" aria-hidden="true">{{ collapsed ? "▲" : "▼" }}</span>
-          {{ collapsed ? "Показать клавиатуру и настройки" : "Свернуть клавиатуру и настройки" }}
+          {{ collapsed ? t("workbench.show") : t("workbench.hide") }}
         </button>
         <span class="workbench__bar-info" v-if="collapsed">
-          {{ metronome.state.bpm }} уд/мин<template v-if="metronome.state.running"> · метроном идёт</template>
+          {{ barInfo }}
         </span>
       </div>
 
       <div class="workbench__inner" id="workbench-body" v-show="!collapsed">
         <div class="row row--wrap workbench__controls">
           <label class="field">
-            <span class="field__label">Темп, уд/мин</span>
+            <span class="field__label">{{ t("workbench.tempo") }}</span>
             <input
               type="range"
               min="40"
@@ -56,17 +60,17 @@
             :class="metronome.state.running ? '' : 'btn--primary'"
             @click="metronome.state.running ? metronome.stop() : metronome.start()"
           >
-            {{ metronome.state.running ? "Стоп метронома" : "Метроном" }}
+            {{ metronome.state.running ? t("workbench.metronomeStop") : t("workbench.metronome") }}
           </button>
 
           <span class="audio-badge" :class="'audio-badge--' + audioStatusKind" role="status" aria-live="polite">
-            Звук: {{ audioStatusText }}
+            {{ t("workbench.audioLabel", { status: audioStatusText }) }}
           </span>
-          <button type="button" class="btn" @click="testSound">Проверить звук</button>
+          <button type="button" class="btn" @click="testSound">{{ t("workbench.audioTest") }}</button>
         </div>
 
         <details class="workbench__settings">
-          <summary>Настройки: MIDI, тембр, звук</summary>
+          <summary>{{ t("workbench.settings") }}</summary>
 
           <div class="row row--wrap">
             <button
@@ -75,12 +79,12 @@
               :disabled="!midi.state.supported || midi.state.busy"
               @click="connectMidi"
             >
-              {{ midi.state.connected || midi.state.inputs.length ? "Обновить список устройств" : "Подключить MIDI" }}
+              {{ midi.state.connected || midi.state.inputs.length ? t("workbench.refreshMidi") : t("workbench.connectMidi") }}
             </button>
             <label class="field" v-if="midi.state.inputs.length">
-              <span class="field__label">Устройство</span>
+              <span class="field__label">{{ t("workbench.device") }}</span>
               <select
-                aria-label="Выбор MIDI-устройства"
+                :aria-label="t('workbench.deviceAria')"
                 :value="midi.state.selectedInputId"
                 @change="midi.selectInput($event.target.value)"
               >
@@ -88,26 +92,28 @@
               </select>
             </label>
             <label class="field">
-              <span class="field__label">Инструмент</span>
+              <span class="field__label">{{ t("workbench.instrument") }}</span>
               <select
-                aria-label="Выбор тембра инструмента"
+                :aria-label="t('workbench.instrumentAria')"
                 :value="synth.state.instrumentId"
                 @change="onInstrumentChange($event.target.value)"
               >
-                <option v-for="item in synth.instruments" :key="item.id" :value="item.id">{{ item.label }}</option>
+                <option v-for="item in synth.instruments" :key="item.id" :value="item.id">
+                  {{ t("instruments." + item.id + ".label") }}
+                </option>
               </select>
             </label>
           </div>
 
           <p class="status" role="status" aria-live="polite">{{ midi.state.status }}</p>
           <p class="card__hint">{{ instrumentHint }}</p>
-          <p class="card__hint" v-if="synth.state.error">Сообщение браузера: {{ synth.state.error }}</p>
+          <p class="card__hint" v-if="synth.state.error">{{ t("workbench.browserMessage", { error: synth.state.error }) }}</p>
 
           <label class="switch">
             <input type="checkbox" v-model="soundEnabled" @change="onSoundChange" />
             <span class="switch__track" aria-hidden="true"></span>
             <span class="switch__label">
-              Звук синтезатора для MIDI (выключен по умолчанию, чтобы не дублировать звук вашей клавиатуры)
+              {{ t("workbench.midiSound") }}
             </span>
           </label>
         </details>
@@ -132,6 +138,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 
 import PianoKeyboard from "./components/PianoKeyboard.vue";
 import ThemeSwitcher from "./components/ThemeSwitcher.vue";
+import LocaleSwitcher from "./components/LocaleSwitcher.vue";
 import HomePage from "./pages/HomePage.vue";
 import LessonPage from "./pages/LessonPage.vue";
 import ScalePage from "./pages/ScalePage.vue";
@@ -142,6 +149,7 @@ import { useWorkbench } from "./composables/useWorkbench";
 import { synth, metronome } from "./stores/audio";
 import { activeNotes, expectedNotes, doneNotes, keyLabels, setActive, emitNote } from "./stores/keyboard";
 import { route } from "./router";
+import { t, locale } from "./i18n";
 
 const { theme, setTheme } = useTheme();
 const { collapsed, toggle, expand } = useWorkbench();
@@ -195,7 +203,7 @@ function onInstrumentChange(id) {
 
 const instrumentHint = computed(() => {
   const current = synth.instruments.find((item) => item.id === synth.state.instrumentId);
-  return current ? current.hint : "";
+  return current ? t("instruments." + current.id + ".hint") : "";
 });
 
 const audioStatusKind = computed(() => {
@@ -205,21 +213,11 @@ const audioStatusKind = computed(() => {
   return "wait";
 });
 
-const audioStatusText = computed(() => {
-  switch (synth.state.status) {
-    case "running":
-      return "работает";
-    case "suspended":
-      return "заблокирован браузером — нажмите «Проверить звук»";
-    case "closed":
-      return "контекст закрыт";
-    case "unsupported":
-      return "браузер не поддерживает Web Audio";
-    case "error":
-      return "ошибка при создании аудиоконтекста";
-    default:
-      return "ещё не запускался";
-  }
+const audioStatusText = computed(() => t("workbench.audioStatus." + synth.state.status));
+
+const barInfo = computed(() => {
+  const key = metronome.state.running ? "workbench.barInfoRunning" : "workbench.barInfo";
+  return t(key, { bpm: metronome.state.bpm, unit: t("workbench.bpmUnit") });
 });
 
 function handleAppBlur() {

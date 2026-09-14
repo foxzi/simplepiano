@@ -10,6 +10,7 @@
 import { reactive } from "vue";
 import { midiToFrequency } from "../constants/piano";
 import { INSTRUMENTS, DEFAULT_INSTRUMENT_ID, findInstrument } from "../constants/instruments";
+import { t } from "../i18n";
 
 const STORAGE_KEY = "pianoL.instrument.v1";
 
@@ -52,7 +53,7 @@ export function useSynth() {
       const Ctor = window.AudioContext || window.webkitAudioContext;
       if (!Ctor) {
         state.status = "unsupported";
-        state.error = "Браузер не поддерживает Web Audio API.";
+        state.error = t("synth.unsupported");
         return null;
       }
       try {

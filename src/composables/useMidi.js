@@ -2,11 +2,12 @@
 // note on с velocity 0 трактуется как note off, согласно спецификации MIDI.
 
 import { reactive, onUnmounted } from "vue";
+import { t } from "../i18n";
 
 export function useMidi({ onNoteOn, onNoteOff } = {}) {
   const state = reactive({
     supported: true,
-    status: "MIDI ещё не подключён.",
+    status: t("midi.notConnected"),
     inputs: [], // [{ id, label }]
     selectedInputId: "",
     connected: false,
@@ -19,14 +20,12 @@ export function useMidi({ onNoteOn, onNoteOff } = {}) {
   function featureCheck() {
     if (!("requestMIDIAccess" in navigator)) {
       state.supported = false;
-      state.status =
-        "Web MIDI API не поддерживается этим браузером. Попробуйте свежий Chrome, Edge или Opera на компьютере.";
+      state.status = t("midi.unsupported");
       return false;
     }
     if (!window.isSecureContext) {
       state.supported = false;
-      state.status =
-        "Web MIDI требует безопасного контекста: откройте страницу через https:// или http://localhost.";
+      state.status = t("midi.insecure");
       return false;
     }
     return true;
@@ -35,7 +34,7 @@ export function useMidi({ onNoteOn, onNoteOff } = {}) {
   function connect() {
     if (!featureCheck()) return;
     state.busy = true;
-    state.status = "Запрашиваем доступ к MIDI...";
+    state.status = t("midi.connecting");
 
     navigator.requestMIDIAccess({ sysex: false }).then(
       (access) => {
@@ -46,8 +45,9 @@ export function useMidi({ onNoteOn, onNoteOff } = {}) {
       },
       (err) => {
         state.busy = false;
-        state.status =
-          "Не удалось получить доступ к MIDI: " + (err && err.message ? err.message : "запрос отклонён") + ".";
+        state.status = t("midi.accessError", {
+          message: err && err.message ? err.message : t("midi.requestDenied"),
+        });
       }
     );
   }
@@ -60,7 +60,7 @@ export function useMidi({ onNoteOn, onNoteOff } = {}) {
 
     if (inputs.length === 0) {
       detachCurrent();
-      state.status = "MIDI-устройства не найдены. Подключите клавиатуру и нажмите «Обновить список устройств».";
+      state.status = t("midi.noDevices");
       return;
     }
 
@@ -74,7 +74,7 @@ export function useMidi({ onNoteOn, onNoteOff } = {}) {
     currentInput = input;
     currentInput.onmidimessage = onMessage;
     state.connected = true;
-    state.status = "Подключено: " + (input.name || input.id) + ".";
+    state.status = t("midi.connected", { name: input.name || input.id });
   }
 
   function detachCurrent() {
@@ -95,7 +95,7 @@ export function useMidi({ onNoteOn, onNoteOff } = {}) {
     const port = event.port;
     if (port && port.type === "input") {
       if (port.state === "disconnected" && currentInput && port.id === currentInput.id) {
-        state.status = "Устройство «" + (port.name || port.id) + "» отключено.";
+        state.status = t("midi.disconnected", { name: port.name || port.id });
         detachCurrent();
       }
       rebuildInputs();

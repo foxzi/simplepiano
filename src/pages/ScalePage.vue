@@ -1,39 +1,36 @@
 <template>
   <div class="page">
     <nav class="crumbs">
-      <a href="#/">Оглавление</a>
+      <a href="#/">{{ t("lesson.crumbHome") }}</a>
       <span aria-hidden="true">/</span>
-      <span>Тренажёр гаммы</span>
+      <span>{{ t("scale.crumbTitle") }}</span>
     </nav>
 
     <header class="page__head">
-      <p class="page__kicker">дополнительно · темы 19–20</p>
-      <h1 class="page__title">Гамма до мажор, одна октава</h1>
-      <p class="page__summary">
-        До – Ре – Ми – Фа – Соль – Ля – Си – До. Сыграйте ноты по порядку выбранной рукой, на MIDI-клавиатуре или
-        мышью по клавишам внизу страницы.
-      </p>
+      <p class="page__kicker">{{ t("scale.kicker") }}</p>
+      <h1 class="page__title">{{ t("scale.title") }}</h1>
+      <p class="page__summary">{{ t("scale.summary") }}</p>
     </header>
 
     <section class="card card--wide">
-      <h2 class="card__title">Упражнение</h2>
+      <h2 class="card__title">{{ t("scale.exerciseTitle") }}</h2>
 
       <div class="row row--wrap">
         <fieldset class="hand-choice">
-          <legend>Рука</legend>
+          <legend>{{ t("scale.handLegend") }}</legend>
           <label>
             <input type="radio" name="hand" value="right" :checked="exercise.state.hand === 'right'" @change="exercise.setHand('right')" />
-            Правая
+            {{ t("scale.handRight") }}
           </label>
           <label>
             <input type="radio" name="hand" value="left" :checked="exercise.state.hand === 'left'" @change="exercise.setHand('left')" />
-            Левая
+            {{ t("scale.handLeft") }}
           </label>
         </fieldset>
 
         <div class="row__buttons">
-          <button type="button" class="btn btn--primary" @click="exercise.start">Начать</button>
-          <button type="button" class="btn" @click="exercise.reset">Сбросить</button>
+          <button type="button" class="btn btn--primary" @click="exercise.start">{{ t("scale.start") }}</button>
+          <button type="button" class="btn" @click="exercise.reset">{{ t("scale.reset") }}</button>
         </div>
       </div>
 
@@ -49,8 +46,8 @@
           <div class="progress__bar" :style="{ width: progressPct + '%' }"></div>
         </div>
         <p class="exercise-status__meta">
-          <span>Шаг: <strong>{{ exercise.state.index }}</strong> / {{ exercise.state.total }}</span>
-          <span>Ошибки: <strong>{{ exercise.state.errors }}</strong></span>
+          <span v-html="t('practice.step', { index: exercise.state.index, total: exercise.state.total })"></span>
+          <span v-html="t('practice.errors', { errors: exercise.state.errors })"></span>
         </p>
       </div>
 
@@ -62,21 +59,21 @@
       <div class="row row--wrap">
         <div class="row__buttons">
           <button type="button" class="btn btn--primary" :disabled="demo.state.playing" @click="demo.play">
-            Играть демонстрацию
+            {{ t("scale.playDemo") }}
           </button>
           <button type="button" class="btn" :disabled="!demo.state.playing" @click="demo.stop">
-            Остановить демонстрацию
+            {{ t("scale.stopDemo") }}
           </button>
         </div>
       </div>
       <p class="card__hint card__hint--tight">
-        Демонстрация проигрывает гамму целиком и подсвечивает клавиши.
+        {{ t("scale.demoHint") }}
       </p>
     </section>
 
     <section class="card card--wide">
-      <h2 class="card__title">Краткая теория</h2>
-      <div class="theory-nav" role="tablist" aria-label="Темы теории">
+      <h2 class="card__title">{{ t("scale.theoryTitle") }}</h2>
+      <div class="theory-nav" role="tablist" :aria-label="t('scale.theoryNavAria')">
         <button
           v-for="lesson in THEORY_LESSONS"
           :key="lesson.id"
@@ -88,7 +85,7 @@
           :id="'theory-tab-' + lesson.id"
           @click="activeLessonId = lesson.id"
         >
-          {{ lesson.title }}
+          {{ t("theory." + lesson.id + ".title") }}
         </button>
       </div>
       <div
@@ -96,7 +93,7 @@
         role="tabpanel"
         aria-live="polite"
         :aria-labelledby="'theory-tab-' + activeLessonId"
-        v-html="activeLesson.html"
+        v-html="t('theory.' + activeLessonId + '.html')"
       ></div>
     </section>
   </div>
@@ -111,6 +108,7 @@ import { noteName } from "../constants/piano";
 import { THEORY_LESSONS } from "../constants/theory";
 import { synth } from "../stores/audio";
 import { onNote, setActive, setHighlight, clearHighlight } from "../stores/keyboard";
+import { t } from "../i18n";
 
 const OWNER = "scale";
 
@@ -126,7 +124,6 @@ const progressPct = computed(() => Math.round((exercise.state.index / exercise.s
 const feedbackClass = computed(() => (exercise.state.feedbackKind ? "status--" + exercise.state.feedbackKind : ""));
 
 const activeLessonId = ref(THEORY_LESSONS[0].id);
-const activeLesson = computed(() => THEORY_LESSONS.find((l) => l.id === activeLessonId.value) || THEORY_LESSONS[0]);
 
 // Подсветка следующей ноты гаммы на общей клавиатуре.
 watch(

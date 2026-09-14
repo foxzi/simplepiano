@@ -13,6 +13,7 @@
 import { computed, reactive } from "vue";
 import { noteName } from "../constants/piano";
 import { metronome, synth } from "../stores/audio";
+import { t } from "../i18n";
 
 // Допустимое отклонение от щелчка метронома — доля длительности доли.
 const RHYTHM_TOLERANCE = 0.35;
@@ -20,21 +21,9 @@ const RHYTHM_TOLERANCE = 0.35;
 // Ноты аккорда, взятые в пределах этого окна, считаются сыгранными вместе.
 const CHORD_WINDOW_MS = 1200;
 
-const INTERVAL_NAMES = {
-  0: "прима",
-  1: "малая секунда",
-  2: "большая секунда",
-  3: "малая терция",
-  4: "большая терция",
-  5: "кварта",
-  6: "тритон",
-  7: "квинта",
-  8: "малая секста",
-  9: "большая секста",
-  10: "малая септима",
-  11: "большая септима",
-  12: "октава",
-};
+function intervalName(semitones) {
+  return t(`intervals.${semitones}`);
+}
 
 export function useLessonTask(practice, { onComplete, repeats } = {}) {
   const notes = practice.notes || [];
@@ -70,6 +59,7 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     round: 0, // сколько кругов пройдено целиком
     errors: 0,
     feedback: "",
+    feedbackKind: "", // "ok" — успешный шаг, для подсветки статуса в интерфейсе
     hits: [], // засчитанные ноты (для set, explore и текущего аккорда)
     inTime: 0, // попаданий в долю (для rhythm)
     answer: null, // загаданная нота (для ear)
@@ -90,26 +80,26 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
   });
 
   const expectedText = computed(() => {
-    if (!state.running) return practice.startHint || "Нажмите «Начать», чтобы приступить к заданию.";
-    if (state.done) return practice.doneText || "Задание выполнено!";
-    if (practice.type === "explore") return `Нажато разных клавиш: ${state.index} из ${total}.`;
+    if (!state.running) return practice.startHint || t("task.defaultStartHint");
+    if (state.done) return practice.doneText || t("task.defaultDoneText");
+    if (practice.type === "explore") return t("task.exploreProgress", { index: state.index, total });
     if (practice.type === "set") {
       const left = notes.filter((midi) => !state.hits.includes(midi));
-      return "Осталось найти: " + left.map(noteName).join(", ");
+      return t("task.setRemaining", { list: left.map(noteName).join(", ") });
     }
     if (practice.type === "chord") {
       const chord = chords[state.index] || [];
       const title = (practice.chordNames || [])[state.index];
       const list = chord.map(noteName).join(" + ");
-      return title ? `Аккорд ${title}: ${list}` : "Возьмите вместе: " + list;
+      return title ? t("task.chordNamed", { title, list }) : t("task.chordPlain", { list });
     }
     if (practice.type === "ear") {
-      return `Вопрос ${state.index + 1} из ${total}: сыграйте вторую услышанную ноту.`;
+      return t("task.earQuestion", { n: state.index + 1, total });
     }
     const midi = notes[state.index];
     if (midi == null) return "";
-    if (practice.noHints) return `Нота ${state.index + 1} из ${total}: играйте по записи, без подсказок.`;
-    return "Сыграйте: " + noteName(midi);
+    if (practice.noHints) return t("task.noteNoHints", { n: state.index + 1, total });
+    return t("task.playNote", { note: noteName(midi) });
   });
 
   // Темп, нужный заданию: уроки про скорость требуют конкретного диапазона BPM.
@@ -125,6 +115,8 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     state.index = 0;
     state.round = 0;
     state.errors = 0;
+    state.feedback = "";
+    state.feedbackKind = "";
     state.hits = [];
     state.inTime = 0;
     state.answer = null;
@@ -137,13 +129,16 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     resetState();
     state.running = true;
     if (practice.type === "rhythm") {
-      state.feedback = "Включите метроном и играйте ровно по щелчкам.";
+      state.feedback = t("task.startRhythm");
+      state.feedbackKind = "";
     } else if (practice.type === "chord") {
-      state.feedback = "Мышью ноты можно брать быстро подряд — это тоже засчитывается.";
+      state.feedback = t("task.startChord");
+      state.feedbackKind = "";
     } else if (practice.type === "ear") {
       nextEarRound();
     } else {
       state.feedback = "";
+      state.feedbackKind = "";
     }
   }
 
@@ -151,6 +146,7 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     state.running = false;
     resetState();
     state.feedback = "";
+    state.feedbackKind = "";
   }
 
   // Круг пройден: либо начинаем следующий, либо задание выполнено.
@@ -159,7 +155,8 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     if (state.round >= passes()) {
       state.done = true;
       state.running = false;
-      state.feedback = practice.doneText || "Отлично, задание выполнено!";
+      state.feedback = practice.doneText || t("task.completeDefault");
+      state.feedbackKind = "ok";
       onComplete && onComplete();
       return;
     }
@@ -170,7 +167,8 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     baseBeat = null;
     countedBeat = -1;
     chordBuffer = [];
-    state.feedback = `Круг ${state.round} из ${passes()} пройден — играйте ещё раз.`;
+    state.feedback = t("task.roundDone", { round: state.round, passes: passes() });
+    state.feedbackKind = "ok";
     if (practice.type === "ear") window.setTimeout(nextEarRound, 700);
   }
 
@@ -188,7 +186,8 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     const list = practice.intervals || [];
     const semitones = list[Math.floor(Math.random() * list.length)];
     state.answer = practice.root + semitones;
-    state.feedback = "Слушайте: сначала опорная нота, затем вторая.";
+    state.feedback = t("task.earListen");
+    state.feedbackKind = "";
     playEar();
   }
 
@@ -213,28 +212,33 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
 
   function handleExplore(midi) {
     if (state.hits.includes(midi)) {
-      state.feedback = "Эту клавишу вы уже нажимали — попробуйте соседнюю.";
+      state.feedback = t("task.exploreRepeat");
+      state.feedbackKind = "error";
       return;
     }
     state.hits.push(midi);
     state.index = state.hits.length;
-    state.feedback = "Звучит " + noteName(midi) + ".";
+    state.feedback = t("task.explorePlayed", { note: noteName(midi) });
+    state.feedbackKind = "";
     if (state.index >= total) finish();
   }
 
   function handleSet(midi) {
     if (!notes.includes(midi)) {
       state.errors += 1;
-      state.feedback = "Это " + noteName(midi) + ". Ищите нужные клавиши.";
+      state.feedback = t("task.setWrong", { note: noteName(midi) });
+      state.feedbackKind = "error";
       return;
     }
     if (state.hits.includes(midi)) {
-      state.feedback = noteName(midi) + " уже найдена.";
+      state.feedback = t("task.setAlready", { note: noteName(midi) });
+      state.feedbackKind = "";
       return;
     }
     state.hits.push(midi);
     state.index = state.hits.length;
-    state.feedback = "Верно: " + noteName(midi) + ".";
+    state.feedback = t("task.correctNote", { note: noteName(midi) });
+    state.feedbackKind = "ok";
     if (state.index >= total) finish();
   }
 
@@ -247,7 +251,8 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
       state.errors += 1;
       chordBuffer = [];
       state.hits = [];
-      state.feedback = "Лишняя нота " + noteName(midi) + " — аккорд начинаем заново.";
+      state.feedback = t("task.chordWrong", { note: noteName(midi) });
+      state.feedbackKind = "error";
       return;
     }
 
@@ -258,22 +263,26 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
       state.index += 1;
       chordBuffer = [];
       state.hits = [];
-      state.feedback = "Аккорд взят.";
+      state.feedback = t("task.chordDone");
+      state.feedbackKind = "ok";
       if (state.index >= total) finish();
     } else {
-      state.feedback = "Держим дальше: осталось " + (chord.length - state.hits.length) + " нот(ы).";
+      state.feedback = t("task.chordHold", { count: chord.length - state.hits.length });
+      state.feedbackKind = "";
     }
   }
 
   function handleEar(midi) {
     if (midi !== state.answer) {
       state.errors += 1;
-      state.feedback = "Это " + noteName(midi) + ". Послушайте ещё раз и сравните с опорной нотой.";
+      state.feedback = t("task.earWrong", { note: noteName(midi) });
+      state.feedbackKind = "error";
       return;
     }
     const semitones = state.answer - practice.root;
     state.index += 1;
-    state.feedback = "Верно: " + (INTERVAL_NAMES[semitones] || "интервал") + ".";
+    state.feedback = t("task.earCorrect", { interval: intervalName(semitones) });
+    state.feedbackKind = "ok";
     if (state.index >= total) {
       finish();
       return;
@@ -284,15 +293,22 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
   function handleRhythm(midi) {
     const hit = beatAccuracy();
     if (hit === null) {
-      state.feedback = "Сначала запустите метроном — играть нужно под щелчки.";
+      state.feedback = t("task.rhythmNoMetronome");
+      state.feedbackKind = "error";
       return false;
     }
     if (!bpmOk()) {
-      state.feedback = `Поставьте темп ${practice.requireBpm.min}–${practice.requireBpm.max} уд/мин.`;
+      state.feedback = t("task.rhythmBpmRange", {
+        min: practice.requireBpm.min,
+        max: practice.requireBpm.max,
+        unit: t("workbench.bpmUnit"),
+      });
+      state.feedbackKind = "error";
       return false;
     }
     if (metronome.state.beat === countedBeat) {
-      state.feedback = "На один щелчок — одна нота. Дождитесь следующего щелчка.";
+      state.feedback = t("task.rhythmOneNote");
+      state.feedbackKind = "";
       return false;
     }
 
@@ -300,12 +316,14 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     if (beats && baseBeat != null) {
       const wanted = baseBeat + (beats[state.index] - beats[0]);
       if (metronome.state.beat < wanted) {
-        state.feedback = "Рано: держите предыдущую ноту, осталось долей — " + (wanted - metronome.state.beat) + ".";
+        state.feedback = t("task.rhythmEarly", { count: wanted - metronome.state.beat });
+        state.feedbackKind = "error";
         return false;
       }
       if (metronome.state.beat > wanted) {
         state.errors += 1;
-        state.feedback = "Поздно: нота должна была вступить раньше. Идём дальше.";
+        state.feedback = t("task.rhythmLate");
+        state.feedbackKind = "error";
         countedBeat = metronome.state.beat;
         return true;
       }
@@ -315,9 +333,11 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     countedBeat = metronome.state.beat;
     if (hit) {
       state.inTime += 1;
-      state.feedback = "В долю!";
+      state.feedback = t("task.rhythmInTime");
+      state.feedbackKind = "ok";
     } else {
-      state.feedback = "Нота верная, но мимо доли — слушайте щелчок.";
+      state.feedback = t("task.rhythmOffBeat");
+      state.feedbackKind = "";
     }
     return true;
   }
@@ -335,15 +355,17 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     if (midi !== target) {
       state.errors += 1;
       state.feedback = practice.noHints
-        ? "Не та нота — прозвучала " + noteName(midi) + "."
-        : "Прозвучала " + noteName(midi) + ", а нужна " + noteName(target) + ".";
+        ? t("task.wrongNoteNoHints", { note: noteName(midi) })
+        : t("task.wrongNote", { note: noteName(midi), expected: noteName(target) });
+      state.feedbackKind = "error";
       return;
     }
 
     if (practice.type === "rhythm") {
       if (!handleRhythm(midi)) return;
     } else {
-      state.feedback = "Верно: " + noteName(midi) + ".";
+      state.feedback = t("task.correctNote", { note: noteName(midi) });
+      state.feedbackKind = "ok";
     }
 
     state.index += 1;

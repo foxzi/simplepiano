@@ -70,7 +70,8 @@
 
 <script setup>
 import { computed } from "vue";
-import { diatonicStep, isBlackKey, noteName, NOTE_NAMES_RU } from "../constants/piano";
+import { diatonicStep, isBlackKey, noteName } from "../constants/piano";
+import { t } from "../i18n";
 
 // Нотный стан рисуется вручную на SVG: нот немного, а зависимость от
 // музыкального шрифта сделала бы вид непредсказуемым в разных браузерах.
@@ -149,7 +150,7 @@ const placed = computed(() =>
       flag: beats <= 0.5,
       flagPath: `M ${flagX} ${flagY} q 11 6 9 18`,
       accidental: isBlackKey(item.midi) ? "\u266F" : "",
-      name: NOTE_NAMES_RU[((item.midi % 12) + 12) % 12],
+      name: noteName(item.midi),
     };
   })
 );
@@ -163,8 +164,8 @@ function itemClass(i) {
 }
 
 const ariaLabel = computed(() => {
-  const names = props.items.map((item) => (item.rest ? "пауза" : noteName(item.midi)));
-  const clefName = props.clef === "bass" ? "Басовый ключ" : "Скрипичный ключ";
+  const names = props.items.map((item) => (item.rest ? t("staff.rest") : noteName(item.midi)));
+  const clefName = props.clef === "bass" ? t("staff.bass") : t("staff.treble");
   return clefName + ": " + names.join(", ");
 });
 </script>
