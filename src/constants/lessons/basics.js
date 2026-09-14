@@ -1,23 +1,12 @@
-// Уроки 1–10 учебной программы (см. docs/ru/ROADMAP.md).
-// Каждый урок — отдельная страница; близкие темы объединены.
-//
-// Блоки теории: text | list | ordered | note
-// Практика: см. src/composables/useLessonTask.js
-//   explore  — нажать count разных клавиш
-//   set      — сыграть все ноты списка в любом порядке
-//   sequence — сыграть ноты по порядку
-//   rhythm   — сыграть ноты по щелчкам метронома
+// Модуль 1 «Первые шаги» — темы 1–10 учебной программы.
+// Формат уроков и типы практик описаны в src/constants/lessons/index.js.
 
-const WHITE_NAMES = {
-  60: "До", 62: "Ре", 64: "Ми", 65: "Фа", 67: "Соль", 69: "Ля", 71: "Си", 72: "До",
-};
+import { WHITE_NAMES, RIGHT_FINGERS, LEFT_FINGERS } from "./shared";
 
-const RIGHT_FINGERS = { 60: "1", 62: "2", 64: "3", 65: "4", 67: "5" };
-const LEFT_FINGERS = { 60: "5", 62: "4", 64: "3", 65: "2", 67: "1" };
-
-export const LESSONS = [
+export const BASICS = [
   {
     id: "keyboard-tour",
+    module: "basics",
     topics: [1],
     title: "Знакомство с клавиатурой",
     summary: "Как устроены белые и чёрные клавиши и почему рисунок повторяется.",
@@ -66,6 +55,7 @@ export const LESSONS = [
 
   {
     id: "white-keys",
+    module: "basics",
     topics: [2, 3],
     title: "Нота До и названия белых клавиш",
     summary: "Опорная нота До и семь белых клавиш: До, Ре, Ми, Фа, Соль, Ля, Си.",
@@ -102,9 +92,9 @@ export const LESSONS = [
         id: "find-c",
         type: "set",
         title: "Практика 1: найдите все До",
-        instruction: "Сыграйте все ноты До, которые есть на этой клавиатуре. Порядок неважен.",
-        notes: [60, 72, 84],
-        doneText: "Все три До найдены.",
+        instruction: "Сыграйте все ноты До, которые есть на этой клавиатуре, — их четыре. Порядок неважен.",
+        notes: [48, 60, 72, 84],
+        doneText: "Все четыре До найдены.",
       },
       {
         id: "white-row",
@@ -121,6 +111,7 @@ export const LESSONS = [
 
   {
     id: "octaves",
+    module: "basics",
     topics: [4],
     title: "Октавы",
     summary: "Почему ноты повторяются и что такое октава.",
@@ -136,7 +127,7 @@ export const LESSONS = [
         items: [
           "Ноты в соседних октавах звучат похоже, но одна выше другой ровно вдвое по частоте.",
           "Октавы нумеруют: до₄ — это До первой октавы в середине клавиатуры (в MIDI — номер 60).",
-          "На экранной клавиатуре здесь две октавы: от до₄ до до₆.",
+          "На экранной клавиатуре здесь три октавы: от до₃ до до₆.",
         ],
       },
       {
@@ -158,16 +149,17 @@ export const LESSONS = [
       {
         id: "octave-find",
         type: "set",
-        title: "Практика 2: найдите Соль в двух октавах",
-        instruction: "Найдите обе ноты Соль. Соль — третья белая клавиша вправо от До.",
-        notes: [67, 79],
-        doneText: "Обе Соль найдены.",
+        title: "Практика 2: найдите Соль во всех октавах",
+        instruction: "Найдите все ноты Соль. Соль — четвёртая белая клавиша вправо от До.",
+        notes: [55, 67, 79],
+        doneText: "Все Соль найдены.",
       },
     ],
   },
 
   {
     id: "fingers",
+    module: "basics",
     topics: [5],
     title: "Номера пальцев",
     summary: "Аппликатура: пальцы нумеруются от большого к мизинцу — от 1 до 5.",
@@ -209,6 +201,7 @@ export const LESSONS = [
 
   {
     id: "five-finger",
+    module: "basics",
     topics: [6, 7],
     title: "Пять нот правой и левой рукой",
     summary: "Пятипальцевая позиция до₄–соль₄ для каждой руки — вверх и вниз.",
@@ -259,6 +252,7 @@ export const LESSONS = [
 
   {
     id: "patterns",
+    module: "basics",
     topics: [8],
     title: "Простые последовательности нот",
     summary: "Движение по соседним нотам, через ноту и первая короткая мелодия.",
@@ -317,6 +311,7 @@ export const LESSONS = [
 
   {
     id: "rhythm",
+    module: "basics",
     topics: [9, 10],
     title: "Основы ритма и игра под метроном",
     summary: "Ровная пульсация, доли и такты, первая игра под щелчки метронома.",
@@ -377,11 +372,3 @@ export const LESSONS = [
     ],
   },
 ];
-
-export function findLesson(id) {
-  return LESSONS.find((lesson) => lesson.id === id) || null;
-}
-
-export function lessonIndex(id) {
-  return LESSONS.findIndex((lesson) => lesson.id === id);
-}
