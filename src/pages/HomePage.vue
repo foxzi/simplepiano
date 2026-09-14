@@ -2,7 +2,7 @@
   <div class="page">
     <section class="hero">
       <p class="hero__kicker">{{ t("home.kicker") }}</p>
-      <h1 class="hero__title">{{ t("home.title") }}</h1>
+      <h1 class="hero__title">{{ t("home.title", { topics: TOPIC_COUNT, lessons: LESSONS.length }) }}</h1>
       <p class="hero__subtitle">{{ t("home.subtitle", { count: LESSONS.length }) }}</p>
     </section>
 
@@ -58,7 +58,7 @@
     <footer class="notebook-footer">
       <p>{{ t("home.footerPrivacy") }}</p>
       <p class="notebook-footer__roadmap">
-        {{ t("home.footerRoadmap") }}
+        {{ t("home.footerRoadmap", { topics: TOPIC_COUNT }) }}
         <a href="./docs/ru/ROADMAP.md">{{ t("home.roadmapRu") }}</a>
         /
         <a href="./docs/en/ROADMAP.md">{{ t("home.roadmapEn") }}</a>
@@ -70,7 +70,7 @@
 <script setup>
 import { computed } from "vue";
 
-import { LESSONS, MODULES, lessonsByModule } from "../constants/lessons";
+import { LESSONS, MODULES, TOPIC_COUNT, lessonsByModule } from "../constants/lessons";
 import { localizeLessonMeta } from "../constants/lessons/localize";
 import { useProgress } from "../composables/useProgress";
 import { lessonHref } from "../router";

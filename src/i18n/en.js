@@ -58,7 +58,7 @@ export const EN = {
 
   home: {
     kicker: "learning notebook \u00b7 piano",
-    title: "Full course: 48 topics",
+    title: "Full course: {topics} topics in {lessons} lessons",
     subtitle:
       "The program is split into six modules and {count} lessons, each with theory and hands-on keyboard practice. " +
       "Go through them in order: every lesson builds on the one before it.",
@@ -75,7 +75,7 @@ export const EN = {
       "is still available.",
     scaleTrainer: "C major scale trainer",
     footerPrivacy: "Your progress is saved locally in this browser. Nothing is sent to a server.",
-    footerRoadmap: "The full learning program (48 topics) \u2014",
+    footerRoadmap: "The full learning program ({topics} topics) \u2014",
     roadmapRu: "roadmap (RU)",
     roadmapEn: "roadmap (EN)",
   },

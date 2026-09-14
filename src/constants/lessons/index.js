@@ -32,6 +32,10 @@ export const MODULES = [
 
 export const LESSONS = [...BASICS, ...READING, ...SCALES, ...HARMONY, ...HANDS, ...MASTERY];
 
+// Тем в программе меньше, чем строк в дорожной карте, не бывает: считаем по урокам,
+// чтобы заголовок на главной не расходился с содержимым.
+export const TOPIC_COUNT = new Set(LESSONS.flatMap((lesson) => lesson.topics)).size;
+
 export function findLesson(id) {
   return LESSONS.find((lesson) => lesson.id === id) || null;
 }

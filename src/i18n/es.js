@@ -57,7 +57,7 @@ export const ES = {
 
   home: {
     kicker: "cuaderno de aprendizaje \u00b7 piano",
-    title: "Curso completo: 48 temas",
+    title: "Curso completo: {topics} temas en {lessons} lecciones",
     subtitle:
       "El programa está dividido en seis módulos y {count} lecciones con teoría y práctica en el teclado. " +
       "Avanza en orden: cada lección se apoya en la anterior.",
@@ -74,7 +74,7 @@ export const ES = {
       "lecciones y sigue disponible.",
     scaleTrainer: "Entrenador de la escala de do mayor",
     footerPrivacy: "El progreso se guarda localmente en tu navegador. No se envía nada al servidor.",
-    footerRoadmap: "Programa de aprendizaje completo (48 temas) —",
+    footerRoadmap: "Programa de aprendizaje completo ({topics} temas) —",
     roadmapRu: "hoja de ruta",
     roadmapEn: "roadmap (EN)",
   },
