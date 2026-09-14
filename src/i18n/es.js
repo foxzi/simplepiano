@@ -11,6 +11,7 @@ export const ES = {
     label: "Navegación principal",
     home: "Índice",
     scale: "Escala",
+    about: "Sobre el proyecto",
   },
 
   theme: {
@@ -210,6 +211,52 @@ export const ES = {
     demoHint: "La demostración toca la escala completa y resalta las teclas.",
     theoryTitle: "Teoría breve",
     theoryNavAria: "Temas de teoría",
+  },
+
+  about: {
+    crumbTitle: "Sobre el proyecto",
+    kicker: "sobre el proyecto",
+    title: "Qué es Simple Piano",
+    lead:
+      "Simple Piano es un curso de piano gratuito que funciona directamente en el navegador. No hay que descargar " +
+      "ni instalar nada y no hace falta registrarse: abres la página y empiezas a tocar.",
+    howTitle: "Cómo funciona",
+    howItems: [
+      "Siempre tienes un teclado en la parte inferior de la pantalla. Puedes tocarlo con el ratón, con el dedo en el móvil o conectar un teclado MIDI real.",
+      "Cada lección es una explicación breve seguida de práctica. La aplicación escucha lo que tocas y te avisa cuando la nota no es la correcta.",
+      "Al lado están el metrónomo y la elección del sonido: piano de cola, piano eléctrico, órgano, cuerdas, caja de música.",
+      "Las lecciones terminadas se marcan con una señal, así siempre ves dónde te quedaste.",
+    ],
+    whoTitle: "Para quién es",
+    whoItems: [
+      "Para quien empieza desde cero y quiere explicaciones claras y sin tecnicismos.",
+      "Para quien estudió alguna vez y quiere repasar notas, escalas y acordes.",
+      "Para quien toma clases con un profesor y busca un entrenador para practicar en casa.",
+      "Para madres y padres que quieren probar la música con su hijo antes de comprar un instrumento.",
+    ],
+    learnTitle: "Qué vas a aprender",
+    learnText:
+      "El cuaderno tiene {lessons} lecciones agrupadas en {modules} módulos: desde la primera tecla que pulsas " +
+      "hasta la lectura de notas, las escalas, los acordes, tocar con las dos manos y tus primeras piezas sencillas. " +
+      "Las lecciones se apoyan unas en otras, así que es mejor no saltárselas.",
+    needTitle: "Qué necesitas para empezar",
+    needItems: [
+      "Cualquier navegador moderno en un ordenador, una tableta o un móvil.",
+      "Auriculares o altavoces: el sonido lo genera el propio navegador, no se descarga nada.",
+      "El teclado MIDI es opcional. Sin él todo funciona igual, solo que tocarás con el ratón o con el dedo.",
+      "De 15 a 20 minutos al día. La práctica corta y regular rinde más que las sesiones largas y esporádicas.",
+    ],
+    privacyTitle: "Privacidad y precio",
+    privacyText:
+      "El proyecto es gratuito, sin publicidad y sin cuentas de usuario. Tu progreso, el idioma y el tema se " +
+      "guardan solo en tu navegador y no se envían a ningún sitio. A cambio: si borras los datos del navegador " +
+      "o abres el sitio en otro dispositivo, el progreso empieza de nuevo.",
+    startTitle: "Por dónde empezar",
+    startText:
+      "Abre el índice y empieza por la primera lección, que explica cómo está organizado el teclado. " +
+      "Si ya conoces las notas, pasa directamente al entrenador de escalas.",
+    ctaHome: "Ir a las lecciones",
+    ctaScale: "Entrenador de escala",
   },
 
   exercise: {

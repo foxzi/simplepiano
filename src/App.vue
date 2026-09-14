@@ -8,6 +8,7 @@
       <nav class="topbar__nav" :aria-label="t('nav.label')">
         <a href="#/" :class="{ 'is-active': route.name === 'home' }">{{ t("nav.home") }}</a>
         <a href="#/scale" :class="{ 'is-active': route.name === 'scale' }">{{ t("nav.scale") }}</a>
+        <a href="#/about" :class="{ 'is-active': route.name === 'about' }">{{ t("nav.about") }}</a>
       </nav>
       <div class="topbar__switchers">
         <ThemeSwitcher :theme="theme" @update:theme="setTheme" />
@@ -19,6 +20,7 @@
     <main class="layout">
       <HomePage v-if="route.name === 'home'" :key="locale" />
       <LessonPage v-else-if="route.name === 'lesson'" :id="route.id" :key="locale + ':' + route.id" />
+      <AboutPage v-else-if="route.name === 'about'" :key="locale" />
       <ScalePage v-else :key="locale" />
     </main>
 
@@ -142,6 +144,7 @@ import LocaleSwitcher from "./components/LocaleSwitcher.vue";
 import HomePage from "./pages/HomePage.vue";
 import LessonPage from "./pages/LessonPage.vue";
 import ScalePage from "./pages/ScalePage.vue";
+import AboutPage from "./pages/AboutPage.vue";
 
 import { useMidi } from "./composables/useMidi";
 import { useTheme } from "./composables/useTheme";

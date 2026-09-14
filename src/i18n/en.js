@@ -12,6 +12,7 @@ export const EN = {
     label: "Main navigation",
     home: "Contents",
     scale: "Scale",
+    about: "About",
   },
 
   theme: {
@@ -211,6 +212,52 @@ export const EN = {
     demoHint: "The demo plays the whole scale and highlights the keys.",
     theoryTitle: "Quick theory",
     theoryNavAria: "Theory topics",
+  },
+
+  about: {
+    crumbTitle: "About",
+    kicker: "about the project",
+    title: "What Simple Piano is",
+    lead:
+      "Simple Piano is a free piano course that runs right in your browser. Nothing to download or install, " +
+      "no sign-up: open the page and start playing.",
+    howTitle: "How it works",
+    howItems: [
+      "A keyboard is always at the bottom of the screen. Play it with the mouse, with your finger on a phone, or plug in a real MIDI keyboard.",
+      "Every lesson is a short explanation followed by practice. The app listens to what you play and tells you when a note is wrong.",
+      "A metronome and a choice of sounds are right there: grand piano, electric piano, organ, strings, music box.",
+      "Finished lessons get a check mark, so you always see where you stopped.",
+    ],
+    whoTitle: "Who it is for",
+    whoItems: [
+      "Complete beginners who want a plain explanation without heavy terminology.",
+      "People who learned once and want to refresh notes, scales and chords.",
+      "Students who take lessons with a teacher and need a trainer for practice at home.",
+      "Parents who want to try music with a child before buying an instrument.",
+    ],
+    learnTitle: "What you will learn",
+    learnText:
+      "The notebook holds {lessons} lessons grouped into {modules} modules: from the very first key press to " +
+      "reading notes, scales, chords, playing with both hands and your first simple pieces. The lessons build on " +
+      "each other, so it is better not to skip ahead.",
+    needTitle: "What you need to start",
+    needItems: [
+      "Any modern browser on a computer, tablet or phone.",
+      "Headphones or speakers: the browser generates the sound itself, nothing is downloaded.",
+      "A MIDI keyboard is optional. Without one everything works the same, you just play with the mouse or your finger.",
+      "15 to 20 minutes a day. Short regular practice beats rare long sessions.",
+    ],
+    privacyTitle: "Privacy and cost",
+    privacyText:
+      "The project is free, with no ads and no accounts. Your progress, language and theme are stored only in " +
+      "your browser and are never sent anywhere. The trade-off: clearing browser data or opening the site on " +
+      "another device starts the progress over.",
+    startTitle: "Where to start",
+    startText:
+      "Open the contents and begin with the first lesson, which explains how the keyboard is laid out. " +
+      "If you already know the notes, go straight to the scale trainer.",
+    ctaHome: "Go to the lessons",
+    ctaScale: "Scale trainer",
   },
 
   exercise: {

@@ -1,4 +1,5 @@
-// Мини-роутер на хэше: #/ — оглавление, #/lesson/<id> — урок, #/scale — тренажёр гаммы.
+// Мини-роутер на хэше: #/ — оглавление, #/lesson/<id> — урок, #/scale — тренажёр гаммы,
+// #/about — описание проекта.
 // Отдельная библиотека не нужна: маршрутов мало, а хэш работает и без сервера.
 
 import { ref } from "vue";
@@ -10,6 +11,7 @@ function parse(hash) {
   const parts = path.split("/").filter(Boolean);
   if (parts[0] === "lesson" && parts[1]) return { name: "lesson", id: parts[1] };
   if (parts[0] === "scale") return { name: "scale", id: null };
+  if (parts[0] === "about") return { name: "about", id: null };
   return { name: "home", id: null };
 }
 
