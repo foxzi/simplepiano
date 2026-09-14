@@ -916,6 +916,34 @@ output {
 
 /* ---------- lesson list ---------- */
 
+.module {
+  display: grid;
+  gap: 14px;
+}
+
+.module__head {
+  display: grid;
+  gap: 4px;
+}
+
+.module__title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.module__summary {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.module__meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .lesson-list {
   list-style: none;
   display: grid;
@@ -1133,4 +1161,115 @@ output {
   .workbench__controls {
     gap: 8px;
   }
+}
+
+/* ---------- нотный стан ---------- */
+
+.staff-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 12px 0 16px;
+  padding-bottom: 4px;
+}
+
+.staff svg {
+  display: block;
+  max-width: none;
+  height: auto;
+}
+
+.staff__line,
+.staff__ledger {
+  stroke: var(--text-soft);
+  stroke-width: 1.4;
+}
+
+.staff__clef,
+.staff__meter {
+  fill: var(--text);
+  font-weight: 600;
+}
+
+.staff__meter {
+  font-size: 20px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.staff__head {
+  fill: var(--text);
+}
+
+.staff__head--open {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2.4;
+}
+
+.staff__stem,
+.staff__flag,
+.staff__rest-mark {
+  stroke: var(--text);
+  stroke-width: 2;
+  fill: none;
+}
+
+.staff__rest {
+  fill: var(--text);
+}
+
+.staff__accidental {
+  fill: var(--text);
+  font-size: 20px;
+}
+
+.staff__name {
+  fill: var(--text-soft);
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.staff__note.is-done .staff__head,
+.staff__note.is-done .staff__rest {
+  fill: var(--accent-bright);
+}
+
+.staff__note.is-done .staff__head--open {
+  fill: none;
+  stroke: var(--accent-bright);
+}
+
+.staff__note.is-done .staff__stem,
+.staff__note.is-done .staff__flag {
+  stroke: var(--accent-bright);
+}
+
+.staff__note.is-current .staff__head {
+  fill: var(--accent);
+}
+
+.staff__note.is-current .staff__head--open {
+  fill: none;
+  stroke: var(--accent);
+}
+
+.staff__note.is-current .staff__stem,
+.staff__note.is-current .staff__flag,
+.staff__note.is-current .staff__accidental {
+  stroke: var(--accent);
+  fill: var(--accent);
+}
+
+.theory__figure {
+  margin: 0;
+}
+
+.theory__figure figcaption {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+.theory__listen {
+  margin-bottom: 12px;
 }

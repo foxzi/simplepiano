@@ -2,10 +2,10 @@
   <div class="page">
     <section class="hero">
       <p class="hero__kicker">учебная тетрадь · фортепиано</p>
-      <h1 class="hero__title">Первые десять тем</h1>
+      <h1 class="hero__title">Полный курс: 48 тем</h1>
       <p class="hero__subtitle">
-        Каждая тема — отдельная страница с теорией и практикой на клавиатуре. Проходите по порядку: следующий урок
-        опирается на предыдущий.
+        Программа разбита на шесть модулей и {{ LESSONS.length }} уроков с теорией и практикой на клавиатуре.
+        Проходите по порядку: следующий урок опирается на предыдущий.
       </p>
     </section>
 
@@ -26,21 +26,32 @@
       </div>
     </section>
 
-    <ol class="lesson-list">
-      <li v-for="(lesson, index) in LESSONS" :key="lesson.id">
-        <a class="lesson-card" :class="{ 'is-done': progress.isDone(lesson.id) }" :href="lessonHref(lesson.id)">
-          <span class="lesson-card__index">{{ index + 1 }}</span>
-          <span class="lesson-card__body">
-            <span class="lesson-card__title">{{ lesson.title }}</span>
-            <span class="lesson-card__summary">{{ lesson.summary }}</span>
-            <span class="lesson-card__meta">
-              Темы программы: {{ lesson.topics.join(", ") }} · практик: {{ lesson.practices.length }}
+    <section class="module" v-for="module in modules" :key="module.id">
+      <header class="module__head">
+        <h2 class="module__title">{{ module.title }}</h2>
+        <p class="module__summary">{{ module.summary }}</p>
+        <p class="module__meta">Пройдено {{ module.doneCount }} из {{ module.items.length }}</p>
+      </header>
+      <ol class="lesson-list">
+        <li v-for="item in module.items" :key="item.lesson.id">
+          <a
+            class="lesson-card"
+            :class="{ 'is-done': progress.isDone(item.lesson.id) }"
+            :href="lessonHref(item.lesson.id)"
+          >
+            <span class="lesson-card__index">{{ item.number }}</span>
+            <span class="lesson-card__body">
+              <span class="lesson-card__title">{{ item.lesson.title }}</span>
+              <span class="lesson-card__summary">{{ item.lesson.summary }}</span>
+              <span class="lesson-card__meta">
+                Темы программы: {{ item.lesson.topics.join(", ") }} · практик: {{ item.lesson.practices.length }}
+              </span>
             </span>
-          </span>
-          <span class="lesson-card__state" aria-hidden="true">{{ progress.isDone(lesson.id) ? "✓" : "→" }}</span>
-        </a>
-      </li>
-    </ol>
+            <span class="lesson-card__state" aria-hidden="true">{{ progress.isDone(item.lesson.id) ? "✓" : "→" }}</span>
+          </a>
+        </li>
+      </ol>
+    </section>
 
     <section class="card card--wide">
       <h2 class="card__title">Дополнительно</h2>
@@ -68,7 +79,7 @@
 <script setup>
 import { computed } from "vue";
 
-import { LESSONS } from "../constants/lessons";
+import { LESSONS, MODULES, lessonsByModule } from "../constants/lessons";
 import { useProgress } from "../composables/useProgress";
 import { lessonHref } from "../router";
 
@@ -77,4 +88,11 @@ const progress = useProgress();
 const doneCount = computed(() => LESSONS.filter((lesson) => progress.isDone(lesson.id)).length);
 const percent = computed(() => Math.round((doneCount.value / LESSONS.length) * 100));
 const nextLesson = computed(() => LESSONS.find((lesson) => !progress.isDone(lesson.id)) || LESSONS[0]);
+
+const modules = computed(() =>
+  MODULES.map((module) => {
+    const items = lessonsByModule(module.id);
+    return { ...module, items, doneCount: items.filter((item) => progress.isDone(item.lesson.id)).length };
+  })
+);
 </script>
