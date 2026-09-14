@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 const DIR = "dist-offline";
-const OUT = join(DIR, "piano-l.html");
+const OUT = join(DIR, "simple-piano.html");
 
 const read = (src) => readFileSync(join(DIR, src.replace(/^\.?\//, "")), "utf8");
 const safe = (code) => code.replace(/<\/script/gi, "<\\/script");

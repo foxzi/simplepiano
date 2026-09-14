@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    image: piano-l-dev
+    image: simple-piano-dev
     working_dir: /app
     ports:
       - "127.0.0.1:5174:5173"

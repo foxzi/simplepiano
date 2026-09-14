@@ -1,9 +1,9 @@
-# piano-l
+# Simple Piano
 
-Учебная тетрадь «Пианино» — веб-приложение для изучения основ фортепиано.
+Simple Piano — учебная тетрадь для изучения основ фортепиано.
 Работает целиком в браузере, без бэкенда.
 
-[English version below](#piano-l-english)
+[English version below](#simple-piano-english)
 
 ## Что внутри
 
@@ -44,7 +44,7 @@ docker compose run --rm app npm run build
 docker compose run --rm app npm run build:offline
 ```
 
-Результат — `dist-offline/piano-l.html` (около 422 КБ). Этот файл
+Результат — `dist-offline/simple-piano.html` (около 426 КБ). Этот файл
 открывается двойным кликом из файлового менеджера, без веб-сервера и без
 интернета: код, стили и шрифты вшиты внутрь HTML.
 
@@ -60,9 +60,9 @@ Safari он недоступен независимо от способа зап
 
 ---
 
-# piano-l (English)
+# Simple Piano (English)
 
-Piano Learning Notebook — a web app for learning piano basics.
+Simple Piano is a web app for learning piano basics.
 Runs entirely in the browser, with no backend.
 
 ## What is inside
@@ -106,7 +106,7 @@ Single file offline build:
 docker compose run --rm app npm run build:offline
 ```
 
-The result is `dist-offline/piano-l.html` (about 422 KB). Open it by
+The result is `dist-offline/simple-piano.html` (about 426 KB). Open it by
 double-clicking in a file manager: no web server and no internet access
 are needed, since code, styles and fonts are inlined into the HTML.
 

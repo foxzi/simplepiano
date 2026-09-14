@@ -3,7 +3,7 @@
     <header class="topbar">
       <a class="topbar__brand" href="#/">
         <span class="topbar__mark" aria-hidden="true">&#9834;</span>
-        <span class="topbar__title">Piano Studio</span>
+        <span class="topbar__title">Simple Piano</span>
       </a>
       <nav class="topbar__nav" aria-label="Основная навигация">
         <a href="#/" :class="{ 'is-active': route.name === 'home' }">Оглавление</a>

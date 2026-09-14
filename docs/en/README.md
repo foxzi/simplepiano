@@ -1,4 +1,4 @@
-# Piano Learning Notebook — English documentation
+# Simple Piano — English documentation
 
 A small, dependency-free-to-the-user web app for learning piano basics: 32
 lesson pages covering all 48 curriculum topics, a C major scale trainer
@@ -34,7 +34,7 @@ The dev server binds only to `127.0.0.1` on the host for safety. If port
 5174 is already used by another project on your machine, change the host
 port in `compose.yaml` (the `ports:` mapping).
 
-A single-file offline build (output: `dist-offline/piano-l.html`, opens
+A single-file offline build (output: `dist-offline/simple-piano.html`, opens
 without a server and without internet access) is described below in
 "Offline build (single file)".
 
@@ -54,7 +54,7 @@ inlined into the CSS as `data:` URIs. The build goes into the
 `dist-offline/` directory, then the `scripts/build-offline.mjs` script
 inlines the resulting JS and CSS directly into the HTML and removes the
 intermediate files. The result is a single file,
-`dist-offline/piano-l.html`, about 422 KB in size.
+`dist-offline/simple-piano.html`, about 426 KB in size.
 
 That file opens with a double-click from a file manager (the `file://`
 protocol), no web server needed. Inlining is required because the browser
@@ -62,7 +62,7 @@ does not execute external `<script type="module" src="...">` tags when a
 page is opened over `file://` (CORS restrictions, `null` origin) — all the
 code has to live inside the HTML itself.
 
-Verified in headless Chrome by opening `dist-offline/piano-l.html` over
+Verified in headless Chrome by opening `dist-offline/simple-piano.html` over
 `file://` with no network access: the app renders, there are no console
 errors, `window.isSecureContext === true`, `navigator.requestMIDIAccess` is
 available (so MIDI keyboards work), Web Audio works, and `localStorage`
