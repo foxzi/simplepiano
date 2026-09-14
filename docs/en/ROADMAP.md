@@ -1,10 +1,9 @@
 # Roadmap
 
-> **Note:** this document describes the **desired and planned curriculum** —
-> the direction the project is aiming for. It is **not** a list of already
-> implemented features. Today topics 1–10 are implemented (see the
-> "Lessons 1-10" section of [README.md](./README.md)); the remaining items
-> are a development plan, not a claim of readiness.
+> This document describes the project's full curriculum — 48 topics grouped
+> into six modules. All topics are implemented as lessons; the breakdown by
+> lesson is given in [README.md](./README.md), section "Curriculum: 32
+> lessons, 48 topics".
 
 ## Full curriculum (48 topics)
 
@@ -62,10 +61,12 @@ future edits of this document.
 
 ## Status
 
-Topics 1–10 are implemented as seven lesson pages with theory and keyboard
-practice (see the "Lessons 1-10" section of [README.md](./README.md)). The
-one-octave C major scale trainer with hand selection is still available
-separately and is a foundation for topics 19–20. Topics 11–48 are not
-implemented yet: this list describes the intended curriculum, not a list of
-completed lessons.
+All 48 topics are implemented: 32 lessons and 86 practice tasks, grouped
+into six modules (see [README.md](./README.md)). The former C major
+scale trainer, one octave with hand selection, is still available
+separately.
+
+Ideas for further development: more pieces and keys, recording and review
+of your own playing, progress export, support for a MIDI pedal controller
+(CC 64), and evaluating dynamics from velocity.
 See [README.md](./README.md) for the prototype's capabilities.

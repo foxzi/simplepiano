@@ -1,7 +1,7 @@
 # Piano Learning Notebook — English documentation
 
-A small, dependency-free-to-the-user web app for learning piano basics: seven
-lesson pages covering the first ten curriculum topics, a C major scale trainer
+A small, dependency-free-to-the-user web app for learning piano basics: 32
+lesson pages covering all 48 curriculum topics, a C major scale trainer
 and a theory reference, with optional MIDI keyboard support. Built
 with Vue 3 and Vite, with three switchable themes (light, dark, notebook).
 
@@ -111,12 +111,16 @@ on the next visit. The metronome click is intentionally independent of the
 selected instrument. No audio samples are used — all sound is synthesized in
 the browser via the Web Audio API.
 
-## Lessons 1-10 (separate pages)
+## Curriculum: 32 lessons, 48 topics
 
-The first ten roadmap topics are implemented as standalone pages. Closely
-related topics are merged, so there are seven pages:
+All 48 roadmap topics are implemented as lesson pages. Closely related
+topics are merged, so there are 32 lessons with 86 practices in total. The
+lessons are grouped into six modules, and the table of contents shows them
+by module.
 
-| # | Page | Topics | Practices |
+### Module 1. First steps (topics 1-10)
+
+| Lesson | Title | Topics | Practices |
 | --- | --- | --- | --- |
 | 1 | Getting to know the keyboard | 1 | 1 |
 | 2 | The note C and the white key names | 2, 3 | 2 |
@@ -126,10 +130,71 @@ related topics are merged, so there are seven pages:
 | 6 | Simple note sequences | 8 | 3 |
 | 7 | Rhythm basics and playing with a metronome | 9, 10 | 2 |
 
+### Module 2. Rhythm and notes (topics 11-18)
+
+| Lesson | Title | Topics | Practices |
+| --- | --- | --- | --- |
+| 8 | Quarter, half, and whole notes | 11 | 3 |
+| 9 | Eighth notes and rests | 12 | 3 |
+| 10 | The musical staff and the treble clef | 13, 14 | 3 |
+| 11 | Reading notes with the right hand | 15 | 3 |
+| 12 | The bass clef and reading with the left hand | 16, 17 | 3 |
+| 13 | Simple melodies from notation | 18 | 3 |
+
+### Module 3. Scales and keys (topics 19-26)
+
+| Lesson | Title | Topics | Practices |
+| --- | --- | --- | --- |
+| 14 | C major scale with both hands | 19, 20, 21 | 3 |
+| 15 | Sharps and flats | 22 | 3 |
+| 16 | G major and F major scales | 23, 24 | 3 |
+| 17 | D major and the remaining major scales | 25, 26 | 3 |
+
+### Module 4. Intervals and chords (topics 27-34)
+
+| Lesson | Title | Topics | Practices |
+| --- | --- | --- | --- |
+| 18 | Whole tone, semitone, and intervals | 27, 28 | 3 |
+| 19 | Intervals by ear | 29 | 2 |
+| 20 | Major and minor triads | 30, 31 | 3 |
+| 21 | Chord inversions | 32 | 3 |
+| 22 | Chords C, F, G and the I-IV-V-I progression | 33, 34 | 3 |
+
+### Module 5. Two hands and repertoire (topics 35-42)
+
+| Lesson | Title | Topics | Practices |
+| --- | --- | --- | --- |
+| 23 | Melody on the right, bass and chords on the left | 35, 36 | 3 |
+| 24 | Playing with both hands and first pieces | 37, 38 | 3 |
+| 25 | Sight reading and playing without hints | 39, 40 | 3 |
+| 26 | Tempo: holding steady and building up | 41, 42 | 3 |
+
+### Module 6. Going deeper (topics 43-48)
+
+| Lesson | Title | Topics | Practices |
+| --- | --- | --- | --- |
+| 27 | Minor scales | 43 | 3 |
+| 28 | Arpeggios | 44 | 3 |
+| 29 | More complex rhythms | 45 | 3 |
+| 30 | Dynamics and musical expression | 46 | 3 |
+| 31 | The pedal | 47 | 2 |
+| 32 | Final pieces | 48 | 3 |
+
 Navigation uses hash routes without an external router: `#/` is the table of
 contents, `#/lesson/<id>` is a lesson, `#/scale` is the original scale
-trainer. The mini router lives in `src/router.js`; lesson texts and tasks are
-in `src/constants/lessons.js`.
+trainer. The mini router lives in `src/router.js`. Lesson texts and tasks
+are split by module under `src/constants/lessons/`: `basics.js`,
+`reading.js`, `scales.js`, `harmony.js`, `hands.js`, `mastery.js`;
+`index.js` combines them into the shared `LESSONS` and `MODULES`, and
+`shared.js` holds common note sets.
+
+### Musical notation
+
+Lessons that involve reading notes show a real musical staff — the
+`src/components/MusicStaff.vue` component draws it on an SVG: treble and
+bass clef, ledger lines, whole, half, quarter, and eighth notes with dots,
+rests, accidentals, and bar lines. Notes are highlighted in sync with the
+practice, so you can see which bar is currently being played.
 
 The keyboard, metronome, instrument selector and MIDI settings live in a
 shared bar at the bottom of the screen (`.workbench` in `App.vue`), identical
@@ -148,7 +213,22 @@ set by the `type` field of a practice:
   error counter but does not reset progress;
 - `rhythm` - same as `sequence`, but every note must land on a metronome
   click: the tolerance is 35% of the beat length, and only one note is
-  counted per beat.
+  counted per beat;
+- `chord` - play a whole chord: the notes must sound together, and the
+  check passes once all keys of the chord are held down at the same time;
+- `ear` - an ear-training task: the app plays a reference note and a second
+  note, and you must find the second one on the keyboard; the number of
+  rounds is set by the `rounds` field.
+
+Additional practice fields:
+
+- `noHints` - do not highlight the keys (sight reading, playing from
+  memory);
+- `requireBpm: { min, max }` - the task only counts when the metronome is
+  within the given tempo range;
+- `labels` - labels shown on the keys (fingering, scale degrees);
+- `chordNames` - chord names shown step by step;
+- `staff` - the staff line drawn by `MusicStaff.vue`.
 
 The keys you need are highlighted on the shared keyboard (amber dot), the
 ones already played turn green. Tasks with fingering show finger numbers on
@@ -181,8 +261,11 @@ still kept separately under `pianoL.progress.v1`.
 
 ## Limitations
 
-- The exercise only covers one specific scale (C major, one octave,
-  ascending). It's a starting point, not a full curriculum.
+- The standalone trainer on the `#/scale` page only covers one scale (C
+  major, one octave, ascending); the other scales are covered in the
+  "Scales and keys" module lessons.
+- The pedal and dynamics are explained and practiced by ear: the app does
+  not read a MIDI pedal controller (CC 64) and does not evaluate velocity.
 - The sound is additive synthesis (see "Instrument sound"), not a sampled
   real piano.
 - The Web Audio "sound" toggle only affects notes coming from a connected
