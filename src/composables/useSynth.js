@@ -104,16 +104,18 @@ export function useSynth() {
   }
 
   // Собирает и запускает голос; возвращает объект с методом release().
-  function spawnVoice(ctx, midi, preset) {
+  // gainScale — громкость относительно пресета (уроки динамики играют тише и громче).
+  function spawnVoice(ctx, midi, preset, gainScale = 1) {
     const now = ctx.currentTime;
     const freq = midiToFrequency(midi);
     const decay = decayTime(preset, midi);
     const sustain = preset.sustain;
+    const peak = preset.gain * gainScale;
 
     const env = ctx.createGain();
     env.gain.setValueAtTime(0, now);
-    env.gain.linearRampToValueAtTime(preset.gain, now + preset.attack);
-    const sustainLevel = Math.max(preset.gain * sustain, 0.0001);
+    env.gain.linearRampToValueAtTime(peak, now + preset.attack);
+    const sustainLevel = Math.max(peak * sustain, 0.0001);
     env.gain.exponentialRampToValueAtTime(sustainLevel, now + preset.attack + decay);
     env.connect(ctx.destination);
 
@@ -197,10 +199,10 @@ export function useSynth() {
   }
 
   // Нота фиксированной длительности — для демонстрации гаммы и проверки звука.
-  function playTransient(midi, durationMs) {
+  function playTransient(midi, durationMs, gainScale = 1) {
     whenRunning((ctx) => {
       const preset = currentPreset();
-      const voice = spawnVoice(ctx, midi, preset);
+      const voice = spawnVoice(ctx, midi, preset, gainScale);
       voice.release(ctx.currentTime + durationMs / 1000);
     });
   }
