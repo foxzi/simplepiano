@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:offline": "OFFLINE_BUILD=1 vite build --outDir dist-offline && node scripts/build-offline.mjs"
   },
   "dependencies": {
     "vue": "^3.5.13"
