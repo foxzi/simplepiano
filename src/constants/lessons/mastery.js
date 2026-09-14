@@ -220,7 +220,7 @@ export const MASTERY = [
         variants: [
           { label: "Тихо (p)", notes: [60, 64, 67, 72], step: 450, hold: 700, gain: 0.35 },
           { label: "Громко (f)", notes: [60, 64, 67, 72], step: 450, hold: 700, gain: 1 },
-          { label: "Крещендо", notes: [60, 64, 67, 72], step: 450, hold: 700, gain: 0.7 },
+          { label: "Крещендо", notes: [60, 64, 67, 72], step: 450, hold: 700, gains: [0.25, 0.45, 0.7, 1] },
         ],
       },
     ],

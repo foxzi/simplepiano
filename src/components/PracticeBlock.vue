@@ -2,6 +2,17 @@
   <section class="practice" :class="{ 'is-running': state.running, 'is-done': state.done }">
     <h3 class="practice__title">{{ practice.title }}</h3>
     <p class="practice__instruction">{{ practice.instruction }}</p>
+    <p class="practice__instruction" v-if="practice.type === 'sequence'">
+      Автоматически проверяется только порядок нот. Ритм, длительности, динамику и технику рук оценивайте самостоятельно.
+    </p>
+    <p class="practice__instruction" v-else-if="practice.type === 'rhythm'">
+      Проверяются ноты и моменты вступлений по щелчкам. Удержание клавиш и тишина в паузах не проверяются.
+      Неточности отмечаются, но не мешают завершить тренировку: оцените счётчик «В долю» и ошибки.
+    </p>
+    <p class="practice__instruction" v-else-if="practice.type === 'chord'">
+      Проверяется набор нот в пределах 1,2 секунды — это допуск для тренировки, а не оценка одновременности.
+      Играйте ноты вместе; удержание клавиш и работу рук оценивайте самостоятельно.
+    </p>
 
     <div class="staff-scroll" v-if="practice.staff">
       <MusicStaff

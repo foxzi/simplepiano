@@ -102,7 +102,8 @@ function playVariant(variant) {
   const hold = variant.hold || 700;
   variant.notes.forEach((item, i) => {
     const group = Array.isArray(item) ? item : [item];
-    window.setTimeout(() => group.forEach((midi) => synth.playTransient(midi, hold, variant.gain || 1)), i * step);
+    const gain = variant.gains?.[i] ?? variant.gain ?? 1;
+    window.setTimeout(() => group.forEach((midi) => synth.playTransient(midi, hold, gain)), i * step);
   });
 }
 const lesson = computed(() => findLesson(props.id));
