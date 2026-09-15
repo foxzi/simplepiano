@@ -45,6 +45,13 @@ docker compose up -d
 docker compose run --rm app npm run build
 ```
 
+Готовый образ для раздачи статики (сборка плюс nginx):
+
+```bash
+docker build -f Dockerfile.prod -t simple-piano .
+docker run -d -p 8080:80 simple-piano
+```
+
 Однофайловая офлайн-сборка:
 
 ```bash
@@ -127,6 +134,13 @@ Production build into `dist/`:
 
 ```bash
 docker compose run --rm app npm run build
+```
+
+A ready to serve image (build plus nginx):
+
+```bash
+docker build -f Dockerfile.prod -t simple-piano .
+docker run -d -p 8080:80 simple-piano
 ```
 
 Single file offline build:

@@ -35,6 +35,20 @@ The dev server binds only to `127.0.0.1` on the host for safety. If port
 5174 is already used by another project on your machine, change the host
 port in `compose.yaml` (the `ports:` mapping).
 
+`compose.yaml` describes the development environment only: it runs `npm run
+dev`. For public hosting there is a separate `Dockerfile.prod`, which builds
+the app and copies `dist/` into an nginx image:
+
+```bash
+docker build -f Dockerfile.prod -t simple-piano .
+docker run -d -p 8080:80 simple-piano
+```
+
+Routing inside the app is based on the URL hash (`#/lesson/...`), so the web
+server needs no rewrite rules pointing back to `index.html`. HTTPS is the
+job of a reverse proxy in front of this container; Web MIDI in Chrome only
+works in a secure context, that is over HTTPS or from localhost.
+
 A single-file offline build (output: `dist-offline/simple-piano.html`, opens
 without a server and without internet access) is described below in
 "Offline build (single file)".
