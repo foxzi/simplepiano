@@ -14,7 +14,8 @@ required on the host.
 Development server (hot reload):
 
 ```bash
-cd /home/piligrim/Work/audio/piano-l
+git clone https://github.com/foxzi/simplepiano.git
+cd simplepiano
 docker compose up -d
 ```
 

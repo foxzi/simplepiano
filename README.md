@@ -25,6 +25,11 @@ Simple Piano — учебная тетрадь для изучения осно�
 
 Все зависимости ставятся внутри Docker, `npm install` на хосте не нужен.
 
+```bash
+git clone https://github.com/foxzi/simplepiano.git
+cd simplepiano
+```
+
 Режим разработки с горячей перезагрузкой:
 
 ```bash
@@ -103,6 +108,11 @@ Stack: Vue 3 + Vite. Vue is the only runtime dependency.
 
 All dependencies are installed inside Docker, so `npm install` on the host
 is not required.
+
+```bash
+git clone https://github.com/foxzi/simplepiano.git
+cd simplepiano
+```
 
 Development server with hot reload:
 
