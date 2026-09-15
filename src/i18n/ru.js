@@ -53,6 +53,8 @@ export const RU = {
     deviceAria: "Выбор MIDI-устройства",
     instrument: "Инструмент",
     instrumentAria: "Выбор тембра инструмента",
+    volume: "Громкость, %",
+    volumeAria: "Уровень громкости",
     browserMessage: "Сообщение браузера: {error}",
     midiSound: "Звук синтезатора для MIDI (выключен по умолчанию, чтобы не дублировать звук вашей клавиатуры)",
   },

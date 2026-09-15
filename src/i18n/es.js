@@ -52,6 +52,8 @@ export const ES = {
     deviceAria: "Selección de dispositivo MIDI",
     instrument: "Instrumento",
     instrumentAria: "Selección de timbre del instrumento",
+    volume: "Volumen, %",
+    volumeAria: "Nivel de volumen",
     browserMessage: "Mensaje del navegador: {error}",
     midiSound: "Sonido del sintetizador para MIDI (desactivado por defecto, para no duplicar el sonido de tu teclado)",
   },

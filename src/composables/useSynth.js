@@ -13,6 +13,9 @@ import { INSTRUMENTS, DEFAULT_INSTRUMENT_ID, findInstrument } from "../constants
 import { t } from "../i18n";
 
 const STORAGE_KEY = "pianoL.instrument.v1";
+const VOLUME_STORAGE_KEY = "pianoL.volume.v1";
+const DEFAULT_VOLUME = 100;
+const VOLUME_RAMP_SECONDS = 0.05; // короткая плавная рампа при изменении громкости слайдером
 
 function safeGet() {
   try {
@@ -30,18 +33,51 @@ function safeSet(value) {
   }
 }
 
+function safeGetVolume() {
+  try {
+    return window.localStorage.getItem(VOLUME_STORAGE_KEY);
+  } catch (err) {
+    return null;
+  }
+}
+
+function safeSetVolume(value) {
+  try {
+    window.localStorage.setItem(VOLUME_STORAGE_KEY, value);
+  } catch (err) {
+    /* private-режим или storage отключён — громкость просто не сохранится */
+  }
+}
+
+// Строго проверяет число 0..100: NaN/Infinity/строки без числа отбрасываются целиком (null),
+// а выходящие за диапазон значения зажимаются.
+function toValidVolume(value) {
+  if (typeof value !== "number" && typeof value !== "string") return null;
+  if (typeof value === "string" && !value.trim()) return null;
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  return Math.min(100, Math.max(0, num));
+}
+
 export function useSynth() {
   const storedId = safeGet();
+  const storedVolume = toValidVolume(safeGetVolume());
   // status: unsupported | idle | suspended | running | closed | error
   const state = reactive({
     status: "idle",
     error: "",
     instrumentId: INSTRUMENTS.some((i) => i.id === storedId) ? storedId : DEFAULT_INSTRUMENT_ID,
+    volume: storedVolume == null ? DEFAULT_VOLUME : storedVolume,
   });
 
   let audioCtx = null;
+  let masterGain = null; // единая точка выхода: все голоса и метроном сходятся сюда перед destination
   const heldNotes = new Map(); // midi -> voice
   const pendingHeld = new Set(); // ноты, ждущие возобновления контекста
+
+  function volumeToGain(percent) {
+    return percent / 100;
+  }
 
   function syncStatus() {
     if (!audioCtx) return;
@@ -64,6 +100,9 @@ export function useSynth() {
         return null;
       }
       audioCtx.addEventListener("statechange", syncStatus);
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = volumeToGain(state.volume);
+      masterGain.connect(audioCtx.destination);
     }
     syncStatus();
     if (audioCtx.state === "suspended") {
@@ -118,7 +157,7 @@ export function useSynth() {
     env.gain.linearRampToValueAtTime(peak, now + preset.attack);
     const sustainLevel = Math.max(peak * sustain, 0.0001);
     env.gain.exponentialRampToValueAtTime(sustainLevel, now + preset.attack + decay);
-    env.connect(ctx.destination);
+    env.connect(masterGain);
 
     let input = env;
     if (preset.filter) {
@@ -221,7 +260,7 @@ export function useSynth() {
       gain.gain.linearRampToValueAtTime(0.0001, now + 0.05);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(masterGain);
       osc.start(now);
       osc.stop(now + 0.06);
     });
@@ -235,6 +274,28 @@ export function useSynth() {
     safeSet(preset.id);
   }
 
+  // Громкость 0..100. Не создаёт AudioContext сама по себе — просто запоминает
+  // выбор, а звук уже играющих голосов плавно доводится до нового уровня,
+  // если контекст уже существует.
+  function setVolume(value) {
+    const next = toValidVolume(value);
+    if (next == null) return;
+    state.volume = next;
+    safeSetVolume(String(next));
+
+    if (audioCtx && masterGain) {
+      const now = audioCtx.currentTime;
+      const target = volumeToGain(next);
+      try {
+        masterGain.gain.cancelScheduledValues(now);
+        masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+        masterGain.gain.linearRampToValueAtTime(target, now + VOLUME_RAMP_SECONDS);
+      } catch (err) {
+        masterGain.gain.value = target;
+      }
+    }
+  }
+
   // Полная остановка и освобождение контекста — вызывается при размонтировании.
   function dispose() {
     stopAllHeld();
@@ -244,6 +305,14 @@ export function useSynth() {
       audioCtx = null;
       state.status = "idle";
     }
+    if (masterGain) {
+      try {
+        masterGain.disconnect();
+      } catch (err) {
+        /* контекст уже закрыт — узел и так недействителен */
+      }
+      masterGain = null;
+    }
   }
 
   return {
@@ -251,6 +320,7 @@ export function useSynth() {
     instruments: INSTRUMENTS,
     ensureContext,
     setInstrument,
+    setVolume,
     startHeld,
     stopHeld,
     stopAllHeld,

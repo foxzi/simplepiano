@@ -53,6 +53,8 @@ export const EN = {
     deviceAria: "Choose a MIDI device",
     instrument: "Instrument",
     instrumentAria: "Choose an instrument sound",
+    volume: "Volume, %",
+    volumeAria: "Volume level",
     browserMessage: "Browser message: {error}",
     midiSound: "Synth sound for MIDI (off by default, so it doesn't duplicate the sound of your own keyboard)",
   },

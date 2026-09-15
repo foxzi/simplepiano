@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "node scripts/test-lessons.mjs && node scripts/test-i18n.mjs",
+    "test": "node scripts/test-lessons.mjs && node scripts/test-i18n.mjs && node scripts/test-volume.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

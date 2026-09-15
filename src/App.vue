@@ -105,6 +105,19 @@
                 </option>
               </select>
             </label>
+            <label class="field">
+              <span class="field__label">{{ t("workbench.volume") }}</span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                :aria-label="t('workbench.volumeAria')"
+                :value="synth.state.volume"
+                @input="onVolumeInput"
+              />
+            </label>
+            <output>{{ synth.state.volume }}%</output>
           </div>
 
           <p class="status" role="status" aria-live="polite">{{ midi.state.status }}</p>
@@ -202,6 +215,12 @@ function testSound() {
 function onInstrumentChange(id) {
   synth.setInstrument(id);
   synth.playTransient(60, 900);
+}
+
+// Слайдер громкости не должен сам создавать AudioContext — только запоминает
+// значение, а звук уже играющих голосов подхватит useSynth сам.
+function onVolumeInput(event) {
+  synth.setVolume(event.target.value);
 }
 
 const instrumentHint = computed(() => {
