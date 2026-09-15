@@ -62,6 +62,19 @@ Safari он недоступен независимо от способа зап
   [localization](docs/en/I18N.md) and
   [roadmap](docs/en/ROADMAP.md)
 
+## Как помочь проекту
+
+Правила оформления веток, коммитов и pull request описаны в
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Лицензия
+
+Код распространяется по лицензии Apache 2.0, см. [LICENSE](LICENSE).
+Вшитые шрифты Fraunces, Manrope и IBM Plex Mono распространяются по
+лицензии SIL Open Font License 1.1, их тексты лежат в каталоге
+[licenses/](licenses/). Сводка по стороннему коду — в файле
+[NOTICE](NOTICE).
+
 ---
 
 # Simple Piano (English)
@@ -127,3 +140,16 @@ Safari do not support it regardless of how the app is started.
 - [Русская документация](docs/ru/README.md),
   [мультиязычность](docs/ru/I18N.md) и
   [дорожная карта](docs/ru/ROADMAP.md)
+
+## Contributing
+
+Branch, commit and pull request conventions are described in
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+The code is released under the Apache License 2.0, see [LICENSE](LICENSE).
+The bundled Fraunces, Manrope and IBM Plex Mono fonts are covered by the
+SIL Open Font License 1.1; their texts live in the
+[licenses/](licenses/) directory. Third-party attributions are collected
+in [NOTICE](NOTICE).

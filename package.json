@@ -3,6 +3,17 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "Browser workbook for learning piano basics: 32 lessons, scale trainer and MIDI support.",
+  "license": "Apache-2.0",
+  "author": "foxzi",
+  "homepage": "https://github.com/foxzi/simplepiano#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foxzi/simplepiano.git"
+  },
+  "bugs": {
+    "url": "https://github.com/foxzi/simplepiano/issues"
+  },
   "scripts": {
     "test": "node scripts/test-lessons.mjs && node scripts/test-i18n.mjs && node scripts/test-volume.mjs",
     "dev": "vite",
