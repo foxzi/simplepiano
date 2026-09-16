@@ -6,6 +6,16 @@ import { join } from "node:path";
 const DIR = "dist-offline";
 const OUT = join(DIR, "simple-piano.html");
 
+// Файлы из public/: в одиночном HTML они не нужны, favicon встраиваем как data: URI.
+const PUBLIC_FILES = [
+  "favicon.svg",
+  "apple-touch-icon.png",
+  "og-cover.png",
+  "site.webmanifest",
+  "robots.txt",
+  "sitemap.xml",
+];
+
 const read = (src) => readFileSync(join(DIR, src.replace(/^\.?\//, "")), "utf8");
 const safe = (code) => code.replace(/<\/script/gi, "<\\/script");
 
@@ -21,8 +31,17 @@ html = html.replace(
   (_, href) => `<style>\n${read(href)}\n</style>`,
 );
 
+const favicon = readFileSync(join(DIR, "favicon.svg"), "utf8");
+html = html.replace(
+  /<link[^>]*rel="icon"[^>]*>/,
+  `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,${Buffer.from(favicon).toString("base64")}">`,
+);
+html = html.replace(/\s*<link[^>]*rel="(apple-touch-icon|manifest|canonical)"[^>]*>/g, "");
+html = html.replace(/\s*<meta[^>]*(property="og:|name="twitter:)[^>]*>/g, "");
+
 writeFileSync(OUT, html);
 rmSync(join(DIR, "assets"), { recursive: true, force: true });
 rmSync(join(DIR, "index.html"), { force: true });
+PUBLIC_FILES.forEach((name) => rmSync(join(DIR, name), { force: true }));
 
 console.log(`${OUT} — ${(Buffer.byteLength(html) / 1024).toFixed(1)} kB`);
