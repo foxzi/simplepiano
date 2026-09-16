@@ -168,12 +168,11 @@ import { route } from "./router";
 import { t, locale } from "./i18n";
 
 const { theme, setTheme } = useTheme();
-const { collapsed, toggle, expand } = useWorkbench();
+const { collapsed, toggle } = useWorkbench();
 const soundEnabled = ref(false);
 
 const midi = useMidi({
   onNoteOn(note) {
-    expand(); // игра на MIDI-клавиатуре возвращает панель на экран
     setActive(note, true);
     if (soundEnabled.value) synth.startHeld(note);
     emitNote(note);

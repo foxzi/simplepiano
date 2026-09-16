@@ -294,6 +294,13 @@ The keyboard, metronome, instrument selector and MIDI settings live in a
 shared bar at the bottom of the screen (`.workbench` in `App.vue`), identical
 on every page, so the keys are always within reach.
 
+The bar can be collapsed with the button in its header to free up room for
+the staff and the lesson text. The choice is kept in localStorage
+(`pianoL.workbench.v1`, `src/composables/useWorkbench.js`) and only that
+button changes it: playing on a connected MIDI keyboard does not expand a
+collapsed bar. Notes still count towards the practice as usual, since the bar
+only hosts the on-screen keyboard and the settings.
+
 ### Practice task types
 
 The task engine is `src/composables/useLessonTask.js`; the kind of task is

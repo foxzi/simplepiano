@@ -1,7 +1,9 @@
 // Свёрнутое или развёрнутое состояние нижней панели с клавиатурой.
 //
 // Панель общая для всех страниц и занимает заметную часть экрана,
-// поэтому выбор пользователя сохраняется в localStorage.
+// поэтому выбор пользователя сохраняется в localStorage. Менять его
+// может только кнопка сворачивания: игра на MIDI-клавиатуре панель
+// не разворачивает.
 
 import { computed, reactive } from "vue";
 
@@ -33,12 +35,5 @@ export function useWorkbench() {
     save();
   }
 
-  // Клик по клавише с физической MIDI-клавиатуры должен показать панель обратно.
-  function expand() {
-    if (!state.collapsed) return;
-    state.collapsed = false;
-    save();
-  }
-
-  return { collapsed, toggle, expand };
+  return { collapsed, toggle };
 }
