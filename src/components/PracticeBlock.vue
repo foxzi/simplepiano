@@ -36,7 +36,9 @@
       <label class="repeats">
         <span class="repeats__label">{{ t("practice.rounds") }}</span>
         <select class="repeats__select" v-model.number="repeats" :disabled="state.running">
-          <option v-for="option in REPEAT_OPTIONS" :key="option" :value="option">{{ option }}</option>
+          <option v-for="option in REPEAT_OPTIONS" :key="option" :value="option">
+            {{ option === INFINITE_REPEATS ? t("practice.infinite") : option }}
+          </option>
         </select>
       </label>
     </div>
@@ -49,7 +51,7 @@
 
     <p class="practice__meta">
       <span v-html="t('practice.step', { index: state.index, total })"></span>
-      <span v-if="passes > 1" v-html="t('practice.round', { round: currentRound, passes })"></span>
+      <span v-if="passes > 1" v-html="roundText"></span>
       <span v-html="t('practice.errors', { errors: state.errors })"></span>
       <span v-if="practice.type === 'rhythm'" v-html="t('practice.inTime', { count: state.inTime })"></span>
     </p>
@@ -63,7 +65,7 @@ import { computed, onUnmounted, watch } from "vue";
 
 import MusicStaff from "./MusicStaff.vue";
 import { useLessonTask } from "../composables/useLessonTask";
-import { getRepeats, setRepeats, REPEAT_OPTIONS } from "../composables/useRepeats";
+import { getRepeats, setRepeats, REPEAT_OPTIONS, INFINITE_REPEATS } from "../composables/useRepeats";
 import { onNote, setHighlight, clearHighlight, activeOwner } from "../stores/keyboard";
 import { t } from "../i18n";
 
@@ -95,15 +97,26 @@ const {
   repeats,
 });
 
+const infinite = computed(() => !Number.isFinite(passes.value));
+
 // Прогресс считаем по всем кругам сразу, чтобы полоса не откатывалась назад.
+// В бесконечном режиме кругов нет предела, поэтому показываем текущий круг.
 const percent = computed(() => {
+  if (!total) return 0;
+  if (state.done) return 100;
+  if (infinite.value) return Math.round((state.index / total) * 100);
   const steps = total * passes.value;
   if (!steps) return 0;
-  if (state.done) return 100;
   return Math.round(((state.round * total + state.index) / steps) * 100);
 });
 
 const currentRound = computed(() => Math.min(state.round + (state.done ? 0 : 1), passes.value));
+
+const roundText = computed(() =>
+  infinite.value
+    ? t("practice.roundInfinite", { round: currentRound.value })
+    : t("practice.round", { round: currentRound.value, passes: passes.value })
+);
 
 // «Послушать» бессмысленно там, где играть нужно наугад или что угодно.
 const canListen = computed(

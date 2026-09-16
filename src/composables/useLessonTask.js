@@ -13,6 +13,7 @@
 import { computed, reactive } from "vue";
 import { noteName } from "../constants/piano";
 import { metronome, synth } from "../stores/audio";
+import { INFINITE_REPEATS } from "./useRepeats";
 import { t } from "../i18n";
 
 // Допустимое отклонение от щелчка метронома — доля длительности доли.
@@ -40,8 +41,10 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
           : notes.length;
 
   // Сколько кругов нужно пройти: значение выбирает пользователь (см. useRepeats).
+  // Бесконечный режим (INFINITE_REPEATS) даёт Infinity — круги не заканчиваются.
   const passes = () => {
     const value = repeats ? repeats.value : 1;
+    if (value === INFINITE_REPEATS) return Infinity;
     return Number.isInteger(value) && value > 0 ? value : 1;
   };
 
@@ -151,8 +154,10 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
 
   // Круг пройден: либо начинаем следующий, либо задание выполнено.
   function finish() {
+    const limit = passes();
+    const infinite = !Number.isFinite(limit);
     state.round += 1;
-    if (state.round >= passes()) {
+    if (state.round >= limit) {
       state.done = true;
       state.running = false;
       state.feedback = practice.doneText || t("task.completeDefault");
@@ -167,7 +172,17 @@ export function useLessonTask(practice, { onComplete, repeats } = {}) {
     baseBeat = null;
     countedBeat = -1;
     chordBuffer = [];
-    state.feedback = t("task.roundDone", { round: state.round, passes: passes() });
+    if (infinite) {
+      // В бесконечном режиме зачёт ставим после первого круга, дальше это тренировка.
+      if (state.round === 1) {
+        state.feedback = t("task.roundDoneCredited");
+        onComplete && onComplete();
+      } else {
+        state.feedback = t("task.roundDoneInfinite", { round: state.round });
+      }
+    } else {
+      state.feedback = t("task.roundDone", { round: state.round, passes: limit });
+    }
     state.feedbackKind = "ok";
     if (practice.type === "ear") window.setTimeout(nextEarRound, 700);
   }
