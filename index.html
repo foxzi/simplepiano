@@ -3,9 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Simple Piano — учебная тетрадь: теория, гамма до мажор, MIDI и метроном в браузере.">
-<title>Simple Piano — учебная тетрадь</title>
-<link rel="icon" href="data:,">
+
+<title>Simple Piano — учебная тетрадь для фортепиано в браузере</title>
+<meta name="description" content="Бесплатный курс фортепиано в браузере: 32 урока с теорией и практикой, тренажёр гаммы до мажор, метроном и поддержка MIDI-клавиатуры. Без регистрации, прогресс хранится в браузере.">
+<meta name="keywords" content="фортепиано, пианино, уроки фортепиано, ноты, сольфеджио, гамма до мажор, метроном, MIDI, learn piano online">
+<meta name="author" content="foxzi">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<link rel="canonical" href="https://simplepiano.org/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Simple Piano">
+<meta property="og:url" content="https://simplepiano.org/">
+<meta property="og:title" content="Simple Piano — учебная тетрадь для фортепиано в браузере">
+<meta property="og:description" content="Бесплатный курс фортепиано в браузере: 32 урока с теорией и практикой, тренажёр гаммы до мажор, метроном и поддержка MIDI-клавиатуры.">
+<meta property="og:image" content="https://simplepiano.org/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Simple Piano — учебная тетрадь для фортепиано">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Simple Piano — учебная тетрадь для фортепиано в браузере">
+<meta name="twitter:description" content="Бесплатный курс фортепиано в браузере: 32 урока, тренажёр гаммы, метроном и MIDI.">
+<meta name="twitter:image" content="https://simplepiano.org/og-cover.png">
+
+<meta name="theme-color" content="#ece1c6">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://simplepiano.org/#website",
+      "url": "https://simplepiano.org/",
+      "name": "Simple Piano",
+      "description": "Учебная тетрадь для фортепиано: 32 урока, тренажёр гаммы, метроном и MIDI прямо в браузере.",
+      "inLanguage": ["ru", "en", "es"]
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://simplepiano.org/#app",
+      "url": "https://simplepiano.org/",
+      "name": "Simple Piano",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Любой браузер с Web Audio",
+      "browserRequirements": "Требуется JavaScript и Web Audio; MIDI-клавиатура подключается по Web MIDI",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": [
+        "32 урока с теорией и практикой",
+        "Экранная клавиатура и нотный стан",
+        "Тренажёр гаммы до мажор",
+        "Метроном с настройкой темпа",
+        "Подключение MIDI-клавиатуры",
+        "Русский, английский и испанский интерфейс"
+      ]
+    },
+    {
+      "@type": "Course",
+      "@id": "https://simplepiano.org/#course",
+      "url": "https://simplepiano.org/",
+      "name": "Фортепиано с нуля: 48 тем в 32 уроках",
+      "description": "Курс для начинающих: устройство клавиатуры, ноты и ритм, гамма до мажор, интервалы и аккорды, игра двумя руками, минор, арпеджио и педаль.",
+      "inLanguage": "ru",
+      "educationalLevel": "Beginner",
+      "isAccessibleForFree": true,
+      "teaches": [
+        "Устройство клавиатуры и названия нот",
+        "Чтение нот в скрипичном и басовом ключе",
+        "Ритм, длительности и работа с метрономом",
+        "Гамма до мажор двумя руками",
+        "Интервалы, трезвучия и аккордовые обороты",
+        "Игра двумя руками, динамика и педаль"
+      ],
+      "provider": { "@id": "https://simplepiano.org/#website" },
+      "offers": { "@type": "Offer", "category": "Free", "price": "0", "priceCurrency": "USD" },
+      "hasCourseInstance": {
+        "@type": "CourseInstance",
+        "courseMode": "online",
+        "courseWorkload": "PT20H"
+      }
+    }
+  ]
+}
+</script>
+
 <script>
   // Применяем сохранённую тему до отрисовки, чтобы избежать мигания.
   (function () {
@@ -26,6 +115,25 @@
 </head>
 <body>
 <div id="app"></div>
+<noscript>
+  <h1>Simple Piano — учебная тетрадь для фортепиано</h1>
+  <p>
+    Simple Piano — бесплатный курс фортепиано для начинающих прямо в браузере:
+    32 урока с теорией и практикой, экранная клавиатура, нотный стан, тренажёр
+    гаммы до мажор, метроном и поддержка MIDI-клавиатуры. Регистрация не нужна,
+    прогресс хранится только в вашем браузере.
+  </p>
+  <p>
+    Для работы приложения нужен включённый JavaScript. Описание проекта и
+    программа курса доступны в репозитории:
+    <a href="https://github.com/foxzi/simplepiano">github.com/foxzi/simplepiano</a>.
+  </p>
+  <p lang="en">
+    Simple Piano is a free browser workbook for piano beginners: 32 lessons with
+    theory and practice, an on-screen keyboard, a staff view, a C major scale
+    trainer, a metronome and MIDI keyboard support. JavaScript is required.
+  </p>
+</noscript>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>

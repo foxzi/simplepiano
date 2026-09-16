@@ -1,0 +1,7 @@
+# Simple Piano — https://simplepiano.org
+# Приложение одностраничное, маршруты живут в хэше и отдельными URL не индексируются.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://simplepiano.org/sitemap.xml

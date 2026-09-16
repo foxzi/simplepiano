@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--
+  Исходник картинки для соцсетей (og:image). Снимок делается вручную:
+  открыть http://localhost:5174/scripts/og-cover.html при окне 1200x630
+  и сохранить кадр в
+  public/og-cover.png. Шрифты берутся из src/assets/fonts.
+-->
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face {
+    font-family: "Fraunces";
+    src: url("../src/assets/fonts/fraunces-latin-wght-normal.woff2") format("woff2");
+    font-weight: 200 800;
+  }
+  @font-face {
+    font-family: "Manrope";
+    src: url("../src/assets/fonts/manrope-cyrillic-wght-normal.woff2") format("woff2");
+    font-weight: 200 800;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    width: 1200px;
+    height: 630px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 64px 80px 0;
+    background: #ece1c6;
+    background-image:
+      radial-gradient(900px 420px at 85% -10%, rgba(76, 148, 104, 0.22), transparent 70%),
+      repeating-linear-gradient(to bottom, transparent 0 47px, rgba(44, 36, 24, 0.07) 47px 48px);
+    color: #2c2418;
+    font-family: "Manrope", system-ui, sans-serif;
+  }
+  .brand { display: flex; align-items: center; gap: 16px; font-size: 28px; letter-spacing: 0.04em; text-transform: uppercase; color: #5b4d38; }
+  .brand svg { width: 64px; height: 64px; }
+  h1 { font-family: "Fraunces", Georgia, serif; font-size: 72px; line-height: 1.06; max-width: 15ch; margin-top: 28px; }
+  p { font-size: 30px; line-height: 1.35; color: #5b4d38; margin-top: 20px; max-width: 28ch; }
+  .tags { display: flex; gap: 14px; margin-top: 26px; }
+  .tags span { font-size: 24px; padding: 9px 20px; border-radius: 999px; background: rgba(255, 253, 246, 0.72); border: 1px solid rgba(44, 36, 24, 0.14); }
+  .keys { display: flex; flex: none; height: 100px; margin: 0 -80px; }
+  .key { position: relative; flex: 1; background: #fffdf6; border-right: 2px solid #c9b98d; border-top: 2px solid #c9b98d; border-radius: 0 0 6px 6px; }
+  .key[data-black]::after { content: ""; position: absolute; top: 0; right: -22px; width: 44px; height: 64px; background: #241d14; border-radius: 0 0 5px 5px; }
+  .url { position: absolute; right: 80px; top: 72px; font-size: 28px; color: #2f6b48; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="brand"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#2f6b48"/><g fill="#fffdf6"><rect x="10" y="38" width="11" height="16" rx="2"/><rect x="26.5" y="38" width="11" height="16" rx="2"/><rect x="43" y="38" width="11" height="16" rx="2"/></g><g fill="#241d14"><rect x="19" y="38" width="7" height="10" rx="1.5"/><rect x="35.5" y="38" width="7" height="10" rx="1.5"/></g><g fill="#fffdf6"><rect x="30" y="10" width="4" height="20" rx="2"/><ellipse cx="26" cy="29" rx="7" ry="5" transform="rotate(-18 26 29)"/><path d="M34 10c6 2.4 10 5.4 10 9.6 0 2.4-1.2 4.4-3.2 6 .5-3.6-1.6-6.2-6.8-8.6z"/></g></svg> Simple Piano</div>
+    <span class="url">simplepiano.org</span>
+    <h1>Фортепиано с нуля прямо в браузере</h1>
+    <p>32 урока с теорией и практикой, тренажёр гаммы, метроном и MIDI.</p>
+    <div class="tags"><span>Бесплатно</span><span>Без регистрации</span><span>RU · EN · ES</span></div>
+  </div>
+  <div class="keys">
+    <div class="key" data-black></div>
+    <div class="key" data-black></div>
+    <div class="key"></div>
+    <div class="key" data-black></div>
+    <div class="key" data-black></div>
+    <div class="key" data-black></div>
+    <div class="key"></div>
+    <div class="key" data-black></div>
+    <div class="key" data-black></div>
+    <div class="key"></div>
+  </div>
+</body>
+</html>
